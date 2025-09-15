@@ -3,15 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensory Carousel Calendar</title>
+    <title>Advanced Carousel Calendar</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <header class="calendar-header">
+        <h1 id="current-date-display" title="날짜 선택">
+            <span id="current-year">2025</span>년 <span id="current-month">9</span>월
+        </h1>
+    </header>
 
     <div class="calendar-container">
         <div class="carousel-viewport">
             <div class="carousel-slider">
                 </div>
+        </div>
+    </div>
+
+    <div id="date-picker-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="selectors-container">
+                <div class="year-selector">
+                    <ul id="year-list"></ul>
+                </div>
+                <div class="month-selector">
+                    <div id="month-grid"></div>
+                </div>
+            </div>
+            <button id="confirm-date-btn">확인</button>
         </div>
     </div>
 
