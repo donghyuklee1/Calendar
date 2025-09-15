@@ -1,87 +1,97 @@
-/* --- 이전 CSS 코드는 그대로 유지 --- */
-/* ... */
+/* ----- 기본 스타일 및 배경 설정 ----- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-/* --- 하단 컨텐츠 패널 --- */
-/* ... */
-.schedule-list .time-slot .event {
-    color: #343a40;
-    font-weight: 500;
+:root {
+    --item-width: 100px; /* 각 날짜 아이템의 너비 */
+    --item-height: 140px; /* 각 날짜 아이템의 높이 */
+    --perspective: 1000px; /* 3D 효과를 위한 원근감 */
 }
 
-/* ... (나머지 스타일은 이전과 동일) */
-
-
-/* --- 일정 추가 모달 스타일 --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-    z-index: 1000;
+    background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460); /* 세련된 배경 */
+    color: white;
+    overflow: hidden; /* 전체 페이지 스크롤 방지 */
 }
 
-.modal-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 24px;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    transform: scale(0.9);
-    transition: transform 0.3s;
-}
-
-.modal-overlay.visible .modal-content {
-    transform: scale(1);
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    margin-bottom: 16px;
-}
-
-#event-input {
+/* ----- 캘린더 컨테이너 ----- */
+.calendar-container {
     width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    box-sizing: border-box;
+    max-width: 800px;
+    height: var(--item-height);
+    position: relative;
 }
 
-.modal-actions {
-    margin-top: 20px;
+/* ----- 캐러셀 뷰포트 (실제 보이는 영역) ----- */
+.carousel-viewport {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    perspective: var(--perspective); /* 3D 효과를 위한 원근 설정 */
+    overflow: hidden; /* 좌우로 벗어나는 아이템들 숨김 */
+    -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent); /* 양쪽 가장자리를 투명하게 */
+    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+}
+
+/* ----- 캐러셀 슬라이더 (모든 날짜를 담고 움직이는 주체) ----- */
+.carousel-slider {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    position: absolute;
+    top: 0;
+    left: 50%; /* 중앙 정렬을 위해 왼쪽을 50% 밀어줌 */
+    transform-style: preserve-3d; /* 자식 요소의 3D 변환 유지 */
+    cursor: grab;
+    user-select: none; /* 드래그 시 텍스트 선택 방지 */
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 부드러운 스냅 효과 */
 }
 
-.modal-actions button {
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: none;
+.carousel-slider.grabbing {
+    cursor: grabbing;
+}
+
+/* ----- 개별 날짜 아이템 ----- */
+.date-item {
+    flex-shrink: 0; /* 아이템이 뷰포트보다 작아지지 않도록 설정 */
+    width: var(--item-width);
+    height: var(--item-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05); /* 투명한 배경 */
+    border-radius: 12px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0 10px;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* 부드러운 효과 */
+}
+
+.date-item .day-of-week {
     font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
+    font-weight: 300;
+    opacity: 0.7;
 }
 
-#save-event-btn {
-    background-color: var(--highlight-color);
-    color: var(--text-color);
+.date-item .day-number {
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1.2;
 }
-#cancel-event-btn {
-    background-color: #e9ecef;
+
+/* 중앙에 위치한 활성 아이템 스타일 */
+.date-item.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ----- 오늘 날짜 표시 ----- */
+.date-item.today .day-number {
+    color: #4dd0e1; /* 포인트 색상 */
 }
