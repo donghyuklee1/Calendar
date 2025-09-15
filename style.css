@@ -1,97 +1,228 @@
-/* ----- 기본 스타일 및 배경 설정 ----- */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
 
 :root {
-    --item-width: 100px; /* 각 날짜 아이템의 너비 */
-    --item-height: 140px; /* 각 날짜 아이템의 높이 */
-    --perspective: 1000px; /* 3D 효과를 위한 원근감 */
+    /* CSS 변수를 통해 색상 테마 관리 (가을 기본) */
+    --bg-grad-1: #0f3460;
+    --bg-grad-2: #16213e;
+    --accent-color: #5eead4;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --surface-bg: rgba(255, 255, 255, 0.05);
+    --surface-border: rgba(255, 255, 255, 0.1);
+    --surface-active-bg: rgba(255, 255, 255, 0.15);
+    --surface-active-border: rgba(255, 255, 255, 0.3);
+
+    --item-width: 90px;
+    --item-height: 120px;
+    --perspective: 1200px;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460); /* 세련된 배경 */
-    color: white;
-    overflow: hidden; /* 전체 페이지 스크롤 방지 */
+    background: linear-gradient(45deg, var(--bg-grad-1), var(--bg-grad-2));
+    color: var(--text-primary);
+    overflow: hidden;
+    transition: background 2s ease; /* 배경색 부드럽게 변경 */
 }
 
-/* ----- 캘린더 컨테이너 ----- */
+/* --- 헤더 --- */
+.calendar-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+#current-date-display {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+#current-date-display:hover {
+    transform: scale(1.05);
+}
+
+/* --- 캘린더 --- */
 .calendar-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     height: var(--item-height);
-    position: relative;
 }
-
-/* ----- 캐러셀 뷰포트 (실제 보이는 영역) ----- */
 .carousel-viewport {
     width: 100%;
     height: 100%;
-    position: relative;
-    perspective: var(--perspective); /* 3D 효과를 위한 원근 설정 */
-    overflow: hidden; /* 좌우로 벗어나는 아이템들 숨김 */
-    -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent); /* 양쪽 가장자리를 투명하게 */
-    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+    perspective: var(--perspective);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
 }
-
-/* ----- 캐러셀 슬라이더 (모든 날짜를 담고 움직이는 주체) ----- */
 .carousel-slider {
     display: flex;
     position: absolute;
     top: 0;
-    left: 50%; /* 중앙 정렬을 위해 왼쪽을 50% 밀어줌 */
-    transform-style: preserve-3d; /* 자식 요소의 3D 변환 유지 */
+    left: 50%;
+    transform-style: preserve-3d;
     cursor: grab;
-    user-select: none; /* 드래그 시 텍스트 선택 방지 */
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 부드러운 스냅 효과 */
+    user-select: none;
 }
-
 .carousel-slider.grabbing {
     cursor: grabbing;
 }
-
-/* ----- 개별 날짜 아이템 ----- */
 .date-item {
-    flex-shrink: 0; /* 아이템이 뷰포트보다 작아지지 않도록 설정 */
+    flex-shrink: 0;
     width: var(--item-width);
     height: var(--item-height);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05); /* 투명한 배경 */
+    background: var(--surface-bg);
     border-radius: 12px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 0 10px;
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* 부드러운 효과 */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--surface-border);
+    margin: 0 8px;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    color: var(--text-secondary);
 }
-
 .date-item .day-of-week {
-    font-size: 0.9rem;
-    font-weight: 300;
-    opacity: 0.7;
+    font-size: 0.8rem;
 }
-
 .date-item .day-number {
-    font-size: 2.5rem;
-    font-weight: 600;
+    font-size: 2.2rem;
+    font-weight: 700;
     line-height: 1.2;
+    color: var(--text-primary);
 }
-
-/* 중앙에 위치한 활성 아이템 스타일 */
 .date-item.active {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--surface-active-bg);
+    border-color: var(--surface-active-border);
+}
+.date-item.today .day-number {
+    color: var(--accent-color);
+    position: relative;
+}
+.date-item.today .day-number::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background-color: var(--accent-color);
+    border-radius: 2px;
 }
 
-/* ----- 오늘 날짜 표시 ----- */
-.date-item.today .day-number {
-    color: #4dd0e1; /* 포인트 색상 */
+/* --- 날짜 선택 모달 --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
 }
+.modal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+.modal-content {
+    background: rgba(30, 30, 50, 0.8);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--surface-border);
+    width: 90%;
+    max-width: 400px;
+}
+.selectors-container {
+    display: flex;
+    height: 250px;
+    margin-bottom: 20px;
+}
+.year-selector {
+    flex: 1;
+    overflow-y: scroll;
+    padding-right: 15px;
+}
+.year-selector ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+.year-selector li {
+    padding: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+.year-selector li:hover {
+    background-color: var(--surface-bg);
+}
+.year-selector li.selected {
+    background-color: var(--accent-color);
+    color: #111;
+    font-weight: 700;
+}
+.month-selector {
+    flex: 2;
+    display: flex;
+    align-items: center;
+}
+#month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+#month-grid div {
+    text-align: center;
+    padding: 15px 5px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+#month-grid div:hover {
+    background-color: var(--surface-bg);
+}
+#month-grid div.selected {
+    background-color: var(--accent-color);
+    color: #111;
+    font-weight: 700;
+}
+#confirm-date-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--accent-color);
+    color: #111;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+#confirm-date-btn:hover {
+    transform: scale(1.02);
+}
+
+/* 스크롤바 스타일 */
+.year-selector::-webkit-scrollbar { width: 5px; }
+.year-selector::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 5px; }
+.year-selector::-webkit-scrollbar-track { background: transparent; }
