@@ -1,84 +1,229 @@
-/* 기본 스타일 초기화 및 폰트 설정 */
+/* --- 기본 및 변수 설정 --- */
+:root {
+    --primary-color: #333;
+    --secondary-color: #777;
+    --background-color: #f8f9fa;
+    --panel-background: #ffffff;
+    --border-color: #e9ecef;
+    --highlight-color: #ffdd00;
+}
+
 body {
     font-family: 'Pretendard', sans-serif;
+    background-color: var(--background-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background-color: #f5f5f7;
-    margin: 0;
-}
-
-/* 캘린더 전체 컨테이너 */
-.calendar-container {
-    width: 90%;
-    max-width: 600px;
-    background-color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-height: 100vh;
     padding: 20px;
+    box-sizing: border-box;
 }
 
-/* 캘린더 헤더 (월/년, 버튼) */
-.calendar-header {
+/* --- 전체 레이아웃 --- */
+.dashboard-container {
+    width: 100%;
+    max-width: 1000px;
+    background-color: var(--panel-background);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+}
+
+.dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.calendar-header h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
+.main-content {
+    display: flex;
+    gap: 20px;
+}
+
+.hourly-schedule, .calendar-analysis {
+    flex: 1;
+    background-color: #fdfdfd;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+/* --- 헤더 --- */
+.logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 8px 16px;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+}
+
+.month-navigator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.month-navigator h2 {
     margin: 0;
+    font-size: 1.8rem;
+    font-weight: 500;
 }
 
-.calendar-header button {
-    border: none;
-    background: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #333;
+.month-navigator button {
+    border: none; background: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary-color);
 }
 
-/* 캘린더 그리드 (요일, 날짜) */
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+.settings-btn {
+    width: 30px; height: 30px; border: 1px solid var(--border-color); border-radius: 50%;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px;
+    background: none; cursor: pointer;
+}
+.settings-btn span {
+    width: 16px; height: 2px; background-color: var(--primary-color); border-radius: 2px;
 }
 
-/* 요일과 날짜 공통 스타일 */
-.day-name, .date-cell {
+/* --- 주간 날짜 선택 --- */
+.week-navigator {
+    display: flex;
+    justify-content: space-around;
     text-align: center;
-    padding: 10px 0;
-    font-size: 0.9rem;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.day-name {
-    font-weight: 600;
-}
-
-/* 날짜 셀 스타일 */
-.date-cell {
+.day-item {
     cursor: pointer;
+}
+.day-item .day-name {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+.day-item .day-number {
+    font-size: 1.4rem;
+    font-weight: 500;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 50%;
-    transition: background-color 0.2s;
+    margin-top: 8px;
+    transition: all 0.2s;
 }
-
-/* 이전/다음 달의 날짜 스타일 (흐리게) */
-.date-cell.other-month {
-    color: #aaa;
-}
-
-/* 오늘 날짜 스타일 */
-.date-cell.today {
-    background-color: #007AFF;
-    color: white;
+.day-item.selected .day-number {
+    background-color: var(--highlight-color);
+    color: var(--primary-color);
     font-weight: 700;
 }
 
-/* 마우스를 올렸을 때 스타일 */
-.date-cell:not(.today):hover {
-    background-color: #e9e9eb;
+/* --- 시간별 일정 (왼쪽) --- */
+.schedule-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.schedule-item .time {
+    width: 50px;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+.schedule-item input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px 4px;
+    background-color: transparent;
+}
+.schedule-item input:focus {
+    outline: none;
+    border-bottom-color: var(--primary-color);
+}
+.schedule-memo {
+    width: 100%;
+    height: 100px;
+    margin-top: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    resize: none;
+}
+.schedule-memo:focus {
+    outline-color: var(--primary-color);
+}
+
+/* --- 캘린더 분석 (오른쪽) --- */
+.calendar-analysis h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+.analysis-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.pie-chart-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+.pie-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #000;
+    background: conic-gradient(
+        #4a90e2 0% 45%,      /* 업무: 파란색 */
+        #50e3c2 45% 75%,     /* 개인: 민트색 */
+        #f5a623 75% 90%,     /* 운동: 주황색 */
+        #e0e0e0 90% 100%     /* 기타: 회색 */
+    );
+}
+.pie-label {
+    position: absolute;
+    font-size: 0.8rem;
+    background-color: rgba(255,255,255,0.7);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.analysis-details {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+.analysis-details li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+.analysis-details span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+.analysis-details li:nth-child(1) span { background-color: #4a90e2; }
+.analysis-details li:nth-child(2) span { background-color: #50e3c2; }
+.analysis-details li:nth-child(3) span { background-color: #f5a623; }
+.analysis-details li:nth-child(4) span { background-color: #e0e0e0; }
+
+.gemini-ask-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--panel-background);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.gemini-ask-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
 }
