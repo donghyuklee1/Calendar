@@ -1,0 +1,84 @@
+/* 기본 스타일 초기화 및 폰트 설정 */
+body {
+    font-family: 'Pretendard', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f7;
+    margin: 0;
+}
+
+/* 캘린더 전체 컨테이너 */
+.calendar-container {
+    width: 90%;
+    max-width: 600px;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+/* 캘린더 헤더 (월/년, 버튼) */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.calendar-header button {
+    border: none;
+    background: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #333;
+}
+
+/* 캘린더 그리드 (요일, 날짜) */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+/* 요일과 날짜 공통 스타일 */
+.day-name, .date-cell {
+    text-align: center;
+    padding: 10px 0;
+    font-size: 0.9rem;
+}
+
+.day-name {
+    font-weight: 600;
+}
+
+/* 날짜 셀 스타일 */
+.date-cell {
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+/* 이전/다음 달의 날짜 스타일 (흐리게) */
+.date-cell.other-month {
+    color: #aaa;
+}
+
+/* 오늘 날짜 스타일 */
+.date-cell.today {
+    background-color: #007AFF;
+    color: white;
+    font-weight: 700;
+}
+
+/* 마우스를 올렸을 때 스타일 */
+.date-cell:not(.today):hover {
+    background-color: #e9e9eb;
+}
