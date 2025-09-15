@@ -1,229 +1,122 @@
-/* --- 기본 및 변수 설정 --- */
+/* --- 기본 설정 --- */
 :root {
-    --primary-color: #333;
-    --secondary-color: #777;
-    --background-color: #f8f9fa;
-    --panel-background: #ffffff;
-    --border-color: #e9ecef;
+    --bg-color: #f8f9fa;
+    --panel-bg-color: #ffffff;
+    --text-color: #212529;
+    --secondary-text-color: #868e96;
+    --border-color: #dee2e6;
     --highlight-color: #ffdd00;
 }
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-color);
+    overflow: hidden; /* 전체 페이지 스크롤 방지 */
+}
 
-body {
-    font-family: 'Pretendard', sans-serif;
-    background-color: var(--background-color);
+/* --- 전체 레이아웃 --- */
+.app-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    flex-direction: column;
+    height: 100%;
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* --- 전체 레이아웃 --- */
-.dashboard-container {
-    width: 100%;
-    max-width: 1000px;
-    background-color: var(--panel-background);
-    border-radius: 20px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-    padding: 24px;
-}
-
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.main-content {
-    display: flex;
-    gap: 20px;
-}
-
-.hourly-schedule, .calendar-analysis {
-    flex: 1;
-    background-color: #fdfdfd;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-}
-
-/* --- 헤더 --- */
-.logo {
-    font-weight: bold;
-    font-size: 1.2rem;
-    padding: 8px 16px;
-    border: 2px solid var(--primary-color);
-    border-radius: 8px;
-}
-
+/* --- 상단: 월 네비게이터 --- */
 .month-navigator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.month-navigator h2 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 500;
-}
-
-.month-navigator button {
-    border: none; background: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary-color);
-}
-
-.settings-btn {
-    width: 30px; height: 30px; border: 1px solid var(--border-color); border-radius: 50%;
-    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px;
-    background: none; cursor: pointer;
-}
-.settings-btn span {
-    width: 16px; height: 2px; background-color: var(--primary-color); border-radius: 2px;
-}
-
-/* --- 주간 날짜 선택 --- */
-.week-navigator {
-    display: flex;
-    justify-content: space-around;
-    text-align: center;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.day-item {
-    cursor: pointer;
-}
-.day-item .day-name {
-    font-size: 0.9rem;
-    color: var(--secondary-color);
-}
-.day-item .day-number {
-    font-size: 1.4rem;
-    font-weight: 500;
-    width: 40px;
-    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    margin-top: 8px;
-    transition: all 0.2s;
-}
-.day-item.selected .day-number {
-    background-color: var(--highlight-color);
-    color: var(--primary-color);
-    font-weight: 700;
-}
-
-/* --- 시간별 일정 (왼쪽) --- */
-.schedule-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-}
-.schedule-item .time {
-    width: 50px;
-    color: var(--secondary-color);
-    font-size: 0.9rem;
-}
-.schedule-item input {
-    flex: 1;
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-    padding: 8px 4px;
-    background-color: transparent;
-}
-.schedule-item input:focus {
-    outline: none;
-    border-bottom-color: var(--primary-color);
-}
-.schedule-memo {
-    width: 100%;
-    height: 100px;
-    margin-top: 20px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 10px;
-    resize: none;
-}
-.schedule-memo:focus {
-    outline-color: var(--primary-color);
-}
-
-/* --- 캘린더 분석 (오른쪽) --- */
-.calendar-analysis h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-.analysis-content {
-    display: flex;
-    align-items: center;
     gap: 20px;
+    flex-shrink: 0; /* 높이가 줄어들지 않도록 */
 }
-.pie-chart-container {
-    position: relative;
-    width: 150px;
-    height: 150px;
-}
-.pie-chart {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 2px solid #000;
-    background: conic-gradient(
-        #4a90e2 0% 45%,      /* 업무: 파란색 */
-        #50e3c2 45% 75%,     /* 개인: 민트색 */
-        #f5a623 75% 90%,     /* 운동: 주황색 */
-        #e0e0e0 90% 100%     /* 기타: 회색 */
-    );
-}
-.pie-label {
-    position: absolute;
-    font-size: 0.8rem;
-    background-color: rgba(255,255,255,0.7);
-    padding: 2px 4px;
-    border-radius: 4px;
+.month-navigator h2 { font-size: 1.8rem; margin: 0; }
+.month-navigator button {
+    border: none; background: none; font-size: 2rem; cursor: pointer; color: var(--secondary-text-color);
 }
 
-.analysis-details {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
+/* --- 중단: 날짜 캐러셀 --- */
+.date-carousel-wrapper {
+    position: relative;
+    padding: 20px 0;
+    overflow: hidden;
+    cursor: grab;
+    flex-shrink: 0;
 }
-.analysis-details li {
-    margin-bottom: 10px;
+.carousel-center-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    background-color: var(--highlight-color);
+    border-radius: 50%;
+    z-index: 0;
+}
+.date-carousel {
     display: flex;
     align-items: center;
+    position: relative;
+    /* JS에서 transform: translateX()로 위치 조절 */
 }
-.analysis-details span {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 8px;
+.day-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 80px; /* 각 날짜 아이템의 너비 */
+    color: var(--secondary-text-color);
+    transition: transform 0.3s ease, color 0.3s ease;
+    z-index: 1;
 }
-.analysis-details li:nth-child(1) span { background-color: #4a90e2; }
-.analysis-details li:nth-child(2) span { background-color: #50e3c2; }
-.analysis-details li:nth-child(3) span { background-color: #f5a623; }
-.analysis-details li:nth-child(4) span { background-color: #e0e0e0; }
+.day-item .day-number { font-size: 1.5rem; font-weight: 500; }
+.day-item .day-name { font-size: 0.9rem; }
 
-.gemini-ask-btn {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--panel-background);
-    font-size: 1rem;
-    font-weight: 600;
+/* 캐러셀 중앙 강조 효과 */
+.day-item.active {
+    color: var(--text-color);
+    transform: scale(1.5);
+}
+.day-item.near { transform: scale(1.1); }
+
+/* --- 하단: 컨텐츠 패널 --- */
+.content-panels {
+    display: flex;
+    gap: 20px;
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    overflow: hidden; /* 내부 스크롤을 위해 */
+}
+.hourly-schedule, .calendar-analysis {
+    flex: 1;
+    background-color: var(--panel-bg-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow-y: auto; /* 내용이 많아지면 스크롤 */
+}
+h3 { margin-top: 0; }
+
+.schedule-list .time-slot {
+    padding: 15px 5px;
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
-    transition: all 0.2s;
 }
-.gemini-ask-btn:hover {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+.schedule-list .time-slot:hover { background-color: #f1f3f5; }
+.time-slot .time { font-weight: 500; margin-right: 10px; }
+.time-slot .event { color: #495057; }
+
+/* 캘린더 분석 */
+.pie-chart {
+    width: 150px; height: 150px; margin: 20px auto; border-radius: 50%;
+    background: conic-gradient(#4a90e2 45%, #50e3c2 45% 75%, #f5a623 75% 90%, #e9ecef 90% 100%);
 }
+.analysis-details { list-style: none; padding-left: 0; }
+.analysis-details li { margin-bottom: 10px; display: flex; align-items: center; }
+.color-chip { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+.color-chip.work { background-color: #4a90e2; }
+.color-chip.personal { background-color: #50e3c2; }
+.color-chip.health { background-color: #f5a623; }
+.color-chip.etc { background-color: #e9ecef; }
