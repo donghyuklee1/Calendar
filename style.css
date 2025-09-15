@@ -30,6 +30,7 @@ body {
     transition: background 1.5s ease;
 }
 
+/*
 /* --- 스플래시 화면 --- */
 #splash-screen {
     position: fixed;
@@ -54,6 +55,7 @@ body {
     opacity: 0;
     visibility: hidden;
 }
+*/
 
 /* --- 상단 월/연도 네비게이터 --- */
 .month-navigator {
