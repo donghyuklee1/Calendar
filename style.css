@@ -22,14 +22,38 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column; /* 아이템을 세로로 배치 */
-    justify-content: center;
+    justify-content: space-between; /* 요소들 사이에 공간 배분 */
     align-items: center;
     background: linear-gradient(45deg, var(--bg-grad-1), var(--bg-grad-2));
     color: var(--text-primary);
     overflow: hidden;
-    padding: 0 1rem;
+    padding: 1rem 1rem; /* 상하 패딩 추가 */
     box-sizing: border-box;
     transition: background 1.5s ease; /* 배경색 부드럽게 변경 */
+}
+
+/* --- 스플래시 화면 --- */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460); /* 초기 배경과 동일하게 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    z-index: 9999; /* 다른 요소들 위에 표시 */
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s ease-out 1s, visibility 0s linear 1.8s; /* 1초 대기 후 0.8초 동안 사라짐 */
+}
+#splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
 }
 
 /* --- 상단 월/연도 네비게이터 --- */
@@ -39,7 +63,8 @@ body {
     align-items: center;
     width: 100%;
     max-width: 400px;
-    margin-bottom: 3rem;
+    margin-top: 2rem; /* 상단 여백 추가 */
+    margin-bottom: 2rem; /* 캘린더와의 간격 */
 }
 .nav-btn {
     background: transparent;
@@ -72,10 +97,13 @@ body {
 }
 
 
-/* --- 캘린더 캐러셀 --- */
+/* --- 캘린더 캐러셀 (중앙 배치) --- */
 .calendar-container {
     width: 100%;
     height: var(--item-height);
+    flex-grow: 1; /* 남은 공간을 채우도록 하여 중앙에 위치하도록 함 */
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
 }
 .carousel-viewport {
     width: 100%;
@@ -87,7 +115,7 @@ body {
 }
 .carousel-slider {
     display: flex;
-    position: absolute;
+    position: absolute; /* .carousel-viewport 기준으로 위치 */
     top: 0;
     left: 50%;
     transform-style: preserve-3d;
@@ -142,4 +170,13 @@ body {
     height: 2px;
     background-color: var(--accent-color);
     border-radius: 2px;
+}
+
+/* --- 푸터 --- */
+.site-footer {
+    margin-top: auto; /* 하단에 고정 */
+    padding-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
 }
