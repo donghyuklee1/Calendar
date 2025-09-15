@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM 요소 선택 ---
+    const splashScreen = document.getElementById('splash-screen'); // 스플래시 화면
     const slider = document.querySelector('.carousel-slider');
     const viewport = document.querySelector('.carousel-viewport');
     const display = {
@@ -166,6 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function initialize() {
+        // 스플래시 화면 처리
+        setTimeout(() => {
+            splashScreen.classList.add('fade-out');
+        }, 1000); // 1초 후 fade-out 클래스 추가
+
         regenerateCalendar(new Date(), new Date().getDate());
 
         prevMonthBtn.addEventListener('click', () => changeMonth(-1));
