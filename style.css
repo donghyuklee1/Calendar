@@ -23,87 +23,65 @@ body {
 
 /* --- 상단 월/연도 네비게이터 --- */
 .month-navigator {
-    position: relative; /* 빠른 선택 패널의 기준점 */
     display: flex; justify-content: space-between; align-items: center;
     width: 100%; max-width: 400px; margin-top: 2rem; margin-bottom: 2rem;
 }
-.nav-btn { /* (기존과 동일) */ }
+.nav-btn {
+    background: transparent; border: none; color: white; font-size: 3rem; font-weight: 100;
+    cursor: pointer; padding: 0 1rem; border-radius: 50%; transition: background-color 0.2s;
+}
+.nav-btn:hover {
+    background-color: var(--surface-bg);
+}
 #month-year-display {
     text-align: center;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: background-color 0.2s;
 }
-#month-year-display:hover {
-    background-color: var(--surface-bg);
+#current-month {
+    font-size: 2.5rem; font-weight: 700; margin: 0; display: block;
 }
-#current-month { /* (기존과 동일) */ }
-#current-year { /* (기존과 동일) */ }
-
-/* --- 빠른 날짜 선택 패널 --- */
-.date-selector-panel {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    width: 300px;
-    background: #1e2a4a;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    z-index: 100;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
-}
-.date-selector-panel.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
-    transition-delay: 0s;
-}
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-.selector-year-btn {
-    background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;
-}
-.month-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-}
-.month-grid div {
-    text-align: center;
-    padding: 0.7rem 0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.month-grid div:hover {
-    background-color: var(--surface-bg);
-}
-.month-grid div.selected {
-    background-color: var(--accent-color);
-    color: #111;
-    font-weight: 700;
+#current-year {
+    font-size: 1rem; font-weight: 300; opacity: 0.7; margin: 0;
 }
 
 /* --- 캘린더 캐러셀 & 푸터 (기존과 동일) --- */
-.calendar-container { /* (기존과 동일) */ }
-.carousel-viewport { /* (기존과 동일) */ }
-.carousel-slider { /* (기존과 동일) */ }
-.carousel-slider.grabbing { /* (기존과 동일) */ }
-.date-item { /* (기존과 동일) */ }
-.date-item .day-of-week { /* (기존과 동일) */ }
-.date-item .day-number { /* (기존과 동일) */ }
-.date-item.active { /* (기존과 동일) */ }
-.date-item.today .day-number { /* (기존과 동일) */ }
-.date-item.today .day-number::after { /* (기존과 동일) */ }
-.site-footer { /* (기존과 동일) */ }
+.calendar-container {
+    width: 100%; height: var(--item-height); flex-grow: 1; display: flex; align-items: center;
+}
+.carousel-viewport {
+    width: 100%; height: 100%; perspective: var(--perspective); overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+.carousel-slider {
+    display: flex; position: absolute; top: 0; left: 50%;
+    transform-style: preserve-d; cursor: grab; user-select: none;
+}
+.carousel-slider.grabbing { cursor: grabbing; }
+.date-item {
+    flex-shrink: 0; width: var(--item-width); height: var(--item-height);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: var(--surface-bg); border-radius: 12px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--surface-border); margin: 0 5px;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; color: var(--text-secondary);
+}
+.date-item .day-of-week { font-size: 0.8rem; }
+.date-item .day-number {
+    font-size: 2rem; font-weight: 700; line-height: 1.2; color: var(--text-primary);
+}
+.date-item.active {
+    background: var(--surface-active-bg); transform: scale(1.05);
+}
+.date-item.today .day-number {
+    color: var(--accent-color); position: relative;
+}
+.date-item.today .day-number::after {
+    content: ''; position: absolute; bottom: -2px; left: 50%;
+    transform: translateX(-50%); width: 18px; height: 2px;
+    background-color: var(--accent-color); border-radius: 2px;
+}
+.site-footer {
+    margin-top: auto; padding-top: 2rem; font-size: 0.9rem;
+    color: var(--text-secondary); opacity: 0.8;
+}
