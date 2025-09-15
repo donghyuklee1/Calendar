@@ -3,51 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Calendar</title>
+    <title>Sensory Carousel Calendar</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <header class="main-header">
-            <h2 id="current-month-year">September 2025</h2>
-        </header>
 
-        <div class="date-carousel-wrapper">
-            <div class="carousel-center-marker"></div>
-            <div class="date-carousel" id="date-carousel">
+    <div class="calendar-container">
+        <div class="carousel-viewport">
+            <div class="carousel-slider">
                 </div>
-        </div>
-
-        <main class="content-panels">
-            <section class="hourly-schedule">
-                <h3>시간별 일정</h3>
-                <div class="schedule-list" id="schedule-list">
-                    </div>
-            </section>
-            <section class="calendar-analysis">
-                <h3>캘린더 분석</h3>
-                <div class="pie-chart"></div>
-                <ul class="analysis-details">
-                    <li><span class="color-chip work"></span>업무 <strong>45%</strong></li>
-                    <li><span class="color-chip personal"></span>개인 <strong>30%</strong></li>
-                    <li><span class="color-chip health"></span>운동 <strong>15%</strong></li>
-                    <li><span class="color-chip etc"></span>기타 <strong>10%</strong></li>
-                </ul>
-            </section>
-        </main>
-    </div>
-
-    <div id="event-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="modal-title">일정 추가</h3>
-            <input type="text" id="event-input" placeholder="일정 내용을 입력하세요...">
-            <div class="modal-actions">
-                <button id="save-event-btn">저장</button>
-                <button id="cancel-event-btn">취소</button>
-            </div>
         </div>
     </div>
 
     <script src="script.js"></script>
+
 </body>
 </html>
