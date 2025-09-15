@@ -198,19 +198,22 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.entries(theme).forEach(([key, value]) => root.style.setProperty(key, value));
     }
     
-    // --- 유틸리티 함수 ---
     function getTotalItemWidth() {
         const itemWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--item-width'));
         return itemWidth + (ITEM_MARGIN * 2);
     }
 
-    // --- 초기화 ---
     function initialize() {
-        if (splashScreen) {
-            setTimeout(() => {
-                splashScreen.classList.add('fade-out');
-            }, 1000);
+        // 필수 HTML 요소들이 모두 있는지 확인하여 오류를 방지합니다.
+        if (!splashScreen || !slider || !viewport || !prevMonthBtn || !nextMonthBtn) {
+            console.error("Calendar initialization failed: One or more essential elements are missing from the HTML.");
+            return;
         }
+
+        // 스플래시 화면을 1초 뒤에 사라지게 합니다.
+        setTimeout(() => {
+            splashScreen.classList.add('fade-out');
+        }, 1000);
 
         regenerateCalendar(new Date(), new Date().getDate());
 
@@ -221,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         slider.addEventListener('mousedown', dragStart);
         window.addEventListener('mousemove', drag);
         window.addEventListener('mouseup', dragEnd);
-        window.addEventListener('mouseleave', dragEnd); // 창 밖으로 나가도 드래그 종료
+        window.addEventListener('mouseleave', dragEnd);
         
         // 모바일 이벤트
         slider.addEventListener('touchstart', dragStart, { passive: true });
