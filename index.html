@@ -1,4 +1,41 @@
 <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donghyuk's Calendar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="splash-screen">
+        <h1>Donghyuk's Calendar</h1>
+    </div>
+
+    <div class="month-navigator">
+        <button id="prev-month-btn" class="nav-btn" aria-label="이전 달">‹</button>
+        <div id="month-year-display">
+            <h2 id="current-month">9월</h2>
+            <p id="current-year">2025</p>
+        </div>
+        <button id="next-month-btn" class="nav-btn" aria-label="다음 달">›</button>
+    </div>
+
+    <div class="calendar-container">
+        <div class="carousel-viewport">
+            <div class="carousel-slider">
+                </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>© 2025 Donghyuk Lee</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
