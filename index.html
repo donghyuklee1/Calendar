@@ -3,25 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 캘린더</title>
+    <title>AI Calendar Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="calendar-container">
-        <div class="calendar-header">
-            <button id="prev-month-btn">&lt;</button>
-            <h1 id="current-month-year"></h1>
-            <button id="next-month-btn">&gt;</button>
-        </div>
-        <div class="calendar-grid">
-            <div class="day-name">일</div>
-            <div class="day-name">월</div>
-            <div class="day-name">화</div>
-            <div class="day-name">수</div>
-            <div class="day-name">목</div>
-            <div class="day-name">금</div>
-            <div class="day-name">토</div>
-            </div>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="logo">로고</div>
+            <nav class="month-navigator">
+                <button id="prev-month-btn">&lt;</button>
+                <h2 id="current-month">September</h2>
+                <button id="next-month-btn">&gt;</button>
+            </nav>
+            <button class="settings-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </header>
+
+        <nav class="week-navigator" id="week-navigator">
+            </nav>
+
+        <main class="main-content">
+            <section class="hourly-schedule">
+                <div class="schedule-item">
+                    <span class="time">12:00</span>
+                    <input type="text" placeholder="점심 약속">
+                </div>
+                <div class="schedule-item">
+                    <span class="time">13:00</span>
+                    <input type="text">
+                </div>
+                <div class="schedule-item">
+                    <span class="time">14:00</span>
+                    <input type="text" placeholder="팀 회의">
+                </div>
+                <div class="schedule-item">
+                    <span class="time">15:00</span>
+                    <input type="text">
+                </div>
+                <textarea class="schedule-memo" placeholder="간단한 일정 메모..."></textarea>
+            </section>
+
+            <section class="calendar-analysis">
+                <h3>캘린더 분석</h3>
+                <div class="analysis-content">
+                    <div class="pie-chart-container">
+                        <div class="pie-chart"></div>
+                        <div class="pie-label" style="top:20%; left:55%;">업무</div>
+                        <div class="pie-label" style="top:55%; left:60%;">개인</div>
+                        <div class="pie-label" style="top:60%; left:20%;">운동</div>
+                    </div>
+                    <ul class="analysis-details">
+                        <li><span></span> 업무 <strong>45%</strong></li>
+                        <li><span></span> 개인 시간 <strong>30%</strong></li>
+                        <li><span></span> 운동 <strong>15%</strong></li>
+                        <li><span></span> 기타 <strong>10%</strong></li>
+                    </ul>
+                </div>
+                <button class="gemini-ask-btn">✨ Gemini에게 물어보기</button>
+            </section>
+        </main>
     </div>
 
     <script src="script.js"></script>
