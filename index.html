@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive AI Calendar</title>
+    <title>AI Calendar</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
-        <nav class="month-navigator">
-            <button id="prev-month-btn">&lt;</button>
-            <h2 id="current-month-year">September</h2>
-            <button id="next-month-btn">&gt;</button>
-        </nav>
+        <header class="main-header">
+            <h2 id="current-month-year">September 2025</h2>
+        </header>
 
         <div class="date-carousel-wrapper">
             <div class="carousel-center-marker"></div>
@@ -37,6 +35,17 @@
                 </ul>
             </section>
         </main>
+    </div>
+
+    <div id="event-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title">일정 추가</h3>
+            <input type="text" id="event-input" placeholder="일정 내용을 입력하세요...">
+            <div class="modal-actions">
+                <button id="save-event-btn">저장</button>
+                <button id="cancel-event-btn">취소</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
