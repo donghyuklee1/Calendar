@@ -6,25 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
 
-    let currentDate = new Date(2025, 8, 16); // 2025년 9월 16일로 시작 (JS에서 월은 0부터 시작)
+    let currentDate = new Date(2025, 8, 16); // 2025년 9월 16일로 시작 (JS 월은 0-11)
 
     function renderCalendar() {
         datesContainer.innerHTML = '';
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        // 1. 헤더 월/년도 업데이트
         monthYearDisplay.textContent = `${year}년 ${month + 1}월`;
 
-        // 2. 날짜 캐러셀 생성
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
 
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
             const dateItem = document.createElement('div');
             dateItem.className = 'date-item';
-            dateItem.dataset.date = date.toISOString().split('T')[0]; // 'YYYY-MM-DD' 형식으로 저장
+            dateItem.dataset.date = date.toISOString().split('T')[0];
 
             const dayName = document.createElement('span');
             dayName.className = 'day-name';
@@ -38,38 +35,41 @@ document.addEventListener('DOMContentLoaded', () => {
             dateItem.appendChild(dayNumber);
             datesContainer.appendChild(dateItem);
 
-            // 오늘 날짜와 선택된 날짜가 같으면 active 클래스 추가
             if (day === currentDate.getDate()) {
                 dateItem.classList.add('active');
             }
-
-            dateItem.addEventListener('click', () => {
-                // 기존 active 클래스 제거
-                const currentActive = datesContainer.querySelector('.active');
-                if (currentActive) {
-                    currentActive.classList.remove('active');
-                }
-                // 새로 클릭된 아이템에 active 클래스 추가
-                dateItem.classList.add('active');
-                currentDate = new Date(dateItem.dataset.date);
-                updateSchedulePanel();
-                centerActiveDate(dateItem);
-            });
         }
+        addDateClickListeners();
         updateSchedulePanel();
         renderTimeline();
         
-        // 초기 렌더링 시 선택된 날짜 중앙 정렬
         setTimeout(() => {
             const activeDateEl = datesContainer.querySelector('.active');
             if(activeDateEl) centerActiveDate(activeDateEl);
         }, 100);
     }
 
+    function addDateClickListeners() {
+        document.querySelectorAll('.date-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // isDragging 플래그를 확인하여 드래그 직후 클릭이벤트 방지
+                if(isDragging) return;
+
+                const currentActive = datesContainer.querySelector('.active');
+                if (currentActive) {
+                    currentActive.classList.remove('active');
+                }
+                item.classList.add('active');
+                currentDate = new Date(item.dataset.date);
+                updateSchedulePanel();
+                centerActiveDate(item);
+            });
+        });
+    }
+
     function updateSchedulePanel() {
         const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
         selectedDateDisplay.textContent = currentDate.toLocaleDateString('ko-KR', options);
-        // 여기에 선택된 날짜의 실제 일정을 불러오는 로직을 추가할 수 있습니다.
     }
 
     function renderTimeline() {
@@ -77,33 +77,24 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let hour = 8; hour <= 22; hour++) {
             const timeSlot = document.createElement('div');
             timeSlot.className = 'time-slot';
-            
-            const timeLabel = document.createElement('span');
-            timeLabel.className = 'time-label';
-            timeLabel.textContent = `${hour}:00`;
-            
-            const eventPlaceholder = document.createElement('div');
-            eventPlaceholder.className = 'event-placeholder';
-            eventPlaceholder.textContent = '+ 새 일정 추가';
-            
-            timeSlot.appendChild(timeLabel);
-            timeSlot.appendChild(eventPlaceholder);
+            timeSlot.innerHTML = `
+                <span class="time-label">${hour}:00</span>
+                <div class="event-placeholder">+ 새 일정 추가</div>
+            `;
             timeline.appendChild(timeSlot);
         }
     }
     
     function centerActiveDate(activeElement) {
         if (!activeElement) return;
-        const containerRect = datesContainer.getBoundingClientRect();
-        const elementRect = activeElement.getBoundingClientRect();
-        const scrollLeft = datesContainer.scrollLeft + elementRect.left - containerRect.left - (containerRect.width / 2) + (elementRect.width / 2);
-        datesContainer.scrollTo({
+        const container = document.querySelector('.date-carousel');
+        const scrollLeft = activeElement.offsetLeft - (container.offsetWidth / 2) + (activeElement.offsetWidth / 2);
+        container.scrollTo({
             left: scrollLeft,
             behavior: 'smooth'
         });
     }
 
-    // 월 이동 버튼 이벤트 리스너
     prevMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
@@ -114,36 +105,51 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCalendar();
     });
 
-    // 드래그 스크롤 기능 추가
+    // --- 드래그 & 스와이프 기능 ---
     let isDown = false;
     let startX;
     let scrollLeft;
+    let isDragging = false; // 드래그와 클릭을 구분하기 위한 플래그
 
-    datesContainer.addEventListener('mousedown', (e) => {
+    const carousel = document.querySelector('.date-carousel');
+
+    const startDrag = (e) => {
         isDown = true;
+        isDragging = false;
+        carousel.classList.add('active-drag');
         datesContainer.style.cursor = 'grabbing';
-        startX = e.pageX - datesContainer.offsetLeft;
-        scrollLeft = datesContainer.scrollLeft;
-    });
+        startX = (e.pageX || e.touches[0].pageX) - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+    };
 
-    datesContainer.addEventListener('mouseleave', () => {
+    const endDrag = () => {
         isDown = false;
+        carousel.classList.remove('active-drag');
         datesContainer.style.cursor = 'grab';
-    });
+        // 짧은 드래그는 클릭으로 간주되지 않도록 isDragging 플래그 사용
+        setTimeout(() => isDragging = false, 50); 
+    };
 
-    datesContainer.addEventListener('mouseup', () => {
-        isDown = false;
-        datesContainer.style.cursor = 'grab';
-    });
-
-    datesContainer.addEventListener('mousemove', (e) => {
+    const doDrag = (e) => {
         if (!isDown) return;
         e.preventDefault();
-        const x = e.pageX - datesContainer.offsetLeft;
-        const walk = (x - startX) * 2; // 스크롤 속도 조절
-        datesContainer.scrollLeft = scrollLeft - walk;
-    });
+        isDragging = true;
+        const x = (e.pageX || e.touches[0].pageX) - carousel.offsetLeft;
+        const walk = (x - startX) * 2; // 스크롤 속도
+        carousel.scrollLeft = scrollLeft - walk;
+    };
+
+    // 마우스 이벤트
+    carousel.addEventListener('mousedown', startDrag);
+    carousel.addEventListener('mouseleave', endDrag);
+    carousel.addEventListener('mouseup', endDrag);
+    carousel.addEventListener('mousemove', doDrag);
     
+    // 터치 이벤트
+    carousel.addEventListener('touchstart', startDrag);
+    carousel.addEventListener('touchend', endDrag);
+    carousel.addEventListener('touchmove', doDrag);
+
     // 초기 렌더링
     renderCalendar();
 });
