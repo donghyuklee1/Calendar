@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM 요소 선택 ---
-    const splashScreen = document.getElementById('splash-screen');
     const slider = document.querySelector('.carousel-slider');
     const viewport = document.querySelector('.carousel-viewport');
     const display = {
@@ -57,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         display.year.textContent = currentDate.getFullYear();
     }
 
-    // --- 월 변경 로직 (안정화 버전) ---
+    // --- 월 변경 로직 ---
     function changeMonth(direction) {
         const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
         newDate.setMonth(newDate.getMonth() + direction);
@@ -204,16 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initialize() {
-        // 필수 HTML 요소들이 모두 있는지 확인하여 오류를 방지합니다.
-        if (!splashScreen || !slider || !viewport || !prevMonthBtn || !nextMonthBtn) {
-            console.error("Calendar initialization failed: One or more essential elements are missing from the HTML.");
+        if (!slider || !viewport || !prevMonthBtn || !nextMonthBtn) {
+            console.error("Calendar initialization failed: One or more essential elements are missing.");
             return;
         }
-
-        // 스플래시 화면을 1초 뒤에 사라지게 합니다.
-        setTimeout(() => {
-            splashScreen.classList.add('fade-out');
-        }, 1000);
 
         regenerateCalendar(new Date(), new Date().getDate());
 
