@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDate = new Date();
     let schedules = JSON.parse(localStorage.getItem('schedules')) || {};
     let activeFilter = 'all';
+    let isDragging = false; // 드래그와 클릭 구분용 플래그
 
     // 상수
     const HOUR_HEIGHT = 60;
@@ -27,10 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('schedules', JSON.stringify(schedules));
     }
 
-    // --- 시간 캐러셀 관련 ---
+    // --- 시간 캐러셀 ---
     function populateTimeCarousels() {
-        const pickers = ['start', 'end'];
-        pickers.forEach(type => {
+        ['start', 'end'].forEach(type => {
             const hoursCarousel = document.getElementById(`${type}-hours`);
             const minutesCarousel = document.getElementById(`${type}-minutes`);
             hoursCarousel.innerHTML = '';
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`${type}-minutes`).scrollTop = Math.round(minute / 5) * 40;
     }
 
-    // --- 모달 관련 ---
+    // --- 모달 ---
     function openModal(hour = null) {
         scheduleForm.reset();
         const dateKey = toYYYYMMDD(currentDate);
@@ -75,9 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('visible');
     }
     
-    function closeModal() {
-        modal.classList.remove('visible');
-    }
+    function closeModal() { modal.classList.remove('visible'); }
     
     // --- UI 렌더링 ---
     function renderAll() {
@@ -118,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addDateClickListeners();
         setTimeout(() => {
             const activeDateEl = datesContainer.querySelector('.active');
-            if(activeDateEl) centerActiveDate(activeDateEl);
+            if(activeDateEl) centerActiveDate(activeDateEl, 'auto');
         }, 100);
     }
 
@@ -135,9 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const dateKey = toYYYYMMDD(currentDate);
         const dailySchedules = schedules[dateKey] || [];
-        const filteredSchedules = activeFilter === 'all' 
-            ? dailySchedules 
-            : dailySchedules.filter(s => s.category === activeFilter);
+        const filteredSchedules = activeFilter === 'all' ? dailySchedules : dailySchedules.filter(s => s.category === activeFilter);
         filteredSchedules.forEach(schedule => {
             const [startHour, startMinute] = schedule.startTime.split(':').map(Number);
             const [endHour, endMinute] = schedule.endTime.split(':').map(Number);
@@ -218,56 +214,131 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 유틸리티 및 헬퍼 함수 ---
     function toYYYYMMDD(date) { return date.toISOString().split('T')[0]; }
     
-    let isDragging = false;
     function addDateClickListeners() {
         document.querySelectorAll('.date-item').forEach(item => {
             item.addEventListener('click', () => {
                 if (isDragging) return;
-                const currentActive = datesContainer.querySelector('.active');
-                if (currentActive) currentActive.classList.remove('active');
-                item.classList.add('active');
-                currentDate = new Date(item.dataset.date);
-                updateUIForNewDate();
+                setActiveDate(item);
             });
         });
     }
 
-    function centerActiveDate(activeElement) {
-        if (!activeElement) return;
-        const scrollLeft = activeElement.offsetLeft - (carousel.offsetWidth / 2) + (activeElement.offsetWidth / 2);
-        carousel.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    function setActiveDate(element) {
+        const currentActive = datesContainer.querySelector('.active');
+        if (currentActive) currentActive.classList.remove('active');
+        element.classList.add('active');
+        currentDate = new Date(element.dataset.date);
+        updateUIForNewDate();
+        centerActiveDate(element);
     }
 
-    // ✨ [추가] 드래그 기능 함수
+    // ✨ [개선] 동적이고 부드러운 스크롤 애니메이션 함수
+    function smoothScrollTo(element, target, duration) {
+        const start = element.scrollLeft;
+        const change = target - start;
+        let startTime = null;
+
+        function animateScroll(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const elapsed = currentTime - startTime;
+            const t = Math.min(elapsed / duration, 1);
+            const easedT = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // easeInOutQuad
+            element.scrollLeft = start + change * easedT;
+            if (elapsed < duration) {
+                requestAnimationFrame(animateScroll);
+            }
+        }
+        requestAnimationFrame(animateScroll);
+    }
+    
+    function centerActiveDate(activeElement, behavior = 'smooth') {
+        if (!activeElement) return;
+        const scrollLeft = activeElement.offsetLeft - (carousel.offsetWidth / 2) + (activeElement.offsetWidth / 2);
+        if (behavior === 'smooth') {
+            smoothScrollTo(carousel, scrollLeft, 400);
+        } else {
+            carousel.scrollLeft = scrollLeft;
+        }
+    }
+
     function makeDraggable(element, options = { direction: 'horizontal' }) {
         let isDown = false, startPos, scrollPos;
         
-        element.addEventListener('mousedown', (e) => {
+        const startDrag = (e) => {
             isDown = true;
             element.classList.add('active-drag');
             startPos = options.direction === 'horizontal' ? e.pageX - element.offsetLeft : e.pageY - element.offsetTop;
             scrollPos = options.direction === 'horizontal' ? element.scrollLeft : element.scrollTop;
-        });
+        };
 
-        element.addEventListener('mouseleave', () => { isDown = false; element.classList.remove('active-drag'); });
-        element.addEventListener('mouseup', () => { isDown = false; element.classList.remove('active-drag'); });
-        
-        element.addEventListener('mousemove', (e) => {
+        const endDrag = (e) => {
+            isDown = false;
+            element.classList.remove('active-drag');
+            // ✨ [추가] 수평 캐러셀(날짜)에만 스냅 기능 적용
+            if (options.direction === 'horizontal') {
+                snapToNearestDate();
+            }
+        };
+
+        const doDrag = (e) => {
             if (!isDown) return;
             e.preventDefault();
+            isDragging = true;
             const pos = options.direction === 'horizontal' ? e.pageX - element.offsetLeft : e.pageY - element.offsetTop;
             const walk = (pos - startPos) * 1.5;
             if (options.direction === 'horizontal') {
                 element.scrollLeft = scrollPos - walk;
-                isDragging = true; setTimeout(() => isDragging = false, 50);
             } else {
                 element.scrollTop = scrollPos - walk;
             }
+        };
+        
+        element.addEventListener('mousedown', startDrag);
+        element.addEventListener('mouseleave', endDrag);
+        element.addEventListener('mouseup', endDrag);
+        element.addEventListener('mousemove', doDrag);
+        element.addEventListener('touchstart', (e) => { startPos = e.touches[0].pageX - element.offsetLeft; scrollPos = element.scrollLeft; }, { passive: true });
+        element.addEventListener('touchend', endDrag);
+    }
+    
+    // ✨ [추가] 드래그 후 가장 가까운 날짜로 스냅하는 함수
+    function snapToNearestDate() {
+        if (!isDragging) return;
+        setTimeout(() => isDragging = false, 50);
+
+        const centerPoint = carousel.scrollLeft + carousel.offsetWidth / 2;
+        let closestItem = null;
+        let minDistance = Infinity;
+
+        document.querySelectorAll('.date-item').forEach(item => {
+            const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+            const distance = Math.abs(centerPoint - itemCenter);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestItem = item;
+            }
         });
+
+        if (closestItem) {
+            setActiveDate(closestItem);
+        }
     }
 
     // --- 이벤트 리스너 등록 ---
     scheduleForm.addEventListener('submit', handleScheduleSubmit);
     cancelButton.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-    timelineEvents.addEventListener
+    timelineEvents.addEventListener('click', handleDelete);
+    categoryFiltersContainer.addEventListener('click', handleFilterClick);
+    prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderAll(); });
+    nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderAll(); });
+    addScheduleBtn.addEventListener('click', () => openModal());
+
+    // --- 초기 실행 ---
+    populateTimeCarousels();
+    makeDraggable(carousel, { direction: 'horizontal' });
+    document.querySelectorAll('.time-carousel').forEach(tc => {
+        makeDraggable(tc, { direction: 'vertical' });
+    });
+    renderAll();
+});
