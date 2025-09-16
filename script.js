@@ -31,6 +31,22 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('schedules', JSON.stringify(schedules));
     }
 
+    function saveCategoryColors() {
+        localStorage.setItem('categoryColors', JSON.stringify(categoryColors));
+    }
+
+    function getCategoryColor(category) {
+        if (categoryColors[category]) {
+            return categoryColors[category]; // 이미 색상이 지정되었으면 반환
+        }
+        // 새 카테고리면 다음 색상 할당
+        const nextColorIndex = Object.keys(categoryColors).length % eventColors.length;
+        const newColor = eventColors[nextColorIndex];
+        categoryColors[category] = newColor; // 새 색상 저장
+        saveCategoryColors(); // 변경사항 localStorage에 저장
+        return newColor;
+    }
+
     // --- 시간 캐러셀 관련 ---
     function populateTimeCarousels() {
         ['start', 'end'].forEach(type => {
@@ -154,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             eventItem.className = 'event-item';
             eventItem.style.top = `${top}px`;
             eventItem.style.height = `${height}px`;
-            const color = schedule.color || eventColors[0];
+            const color = getCategoryColor(schedule.category);
             eventItem.style.setProperty('--event-color', color.hex);
             eventItem.style.setProperty('--event-rgb-color', color.rgb);
             eventItem.innerHTML = `<div class="event-item-header"><span class="category">${schedule.category}</span><button class="delete-btn" data-id="${schedule.id}">&times;</button></div><span class="memo">${schedule.memo}</span>`;
@@ -187,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = modal.dataset.date;
         const currentSchedules = schedules[date] || [];
         const colorIndex = currentSchedules.length % eventColors.length;
-        const color = eventColors[colorIndex];
+        const color = getCategoryColor(category);
         const newSchedule = {
             id: Date.now(),
             category: document.getElementById('schedule-category').value || "#기타",
