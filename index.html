@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar</title>
+    <title>미래형 캘린더</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,14 +18,16 @@
         </header>
 
         <div class="date-carousel">
-            <div class="dates" id="dates-container">
-                </div>
+            <div class="dates" id="dates-container"></div>
         </div>
 
         <main class="schedule-panel">
-            <h2 id="selected-date-display">2025년 9월 16일 화요일</h2>
-            <div class="timeline" id="timeline">
-                </div>
+            <h2 id="selected-date-display"></h2>
+            <div class="category-filters" id="category-filters"></div>
+            <div class="timeline-container">
+                <div class="timeline" id="timeline"></div>
+                <div class="timeline-events" id="timeline-events"></div>
+            </div>
         </main>
     </div>
 
@@ -33,11 +35,25 @@
         <div class="modal-content">
             <h3>새 일정 추가</h3>
             <form id="schedule-form">
-                <input type="text" id="schedule-category" placeholder="#카테고리 (예: #회의, #운동)" required>
-                <div class="time-inputs">
-                    <label>시작 <input type="time" id="schedule-start-time" required></label>
-                    <label>종료 <input type="time"id="schedule-end-time" required></label>
+                <input type="text" id="schedule-category" placeholder="#카테고리 (예: #회의)" required>
+                
+                <div class="time-picker-wrapper">
+                    <div class="time-picker-container">
+                        <label>시작</label>
+                        <div class="time-picker" id="start-time-picker">
+                            <div class="time-carousel hours" id="start-hours"></div>
+                            <div class="time-carousel minutes" id="start-minutes"></div>
+                        </div>
+                    </div>
+                    <div class="time-picker-container">
+                        <label>종료</label>
+                        <div class="time-picker" id="end-time-picker">
+                            <div class="time-carousel hours" id="end-hours"></div>
+                            <div class="time-carousel minutes" id="end-minutes"></div>
+                        </div>
+                    </div>
                 </div>
+                
                 <textarea id="schedule-memo" placeholder="메모를 입력하세요..." rows="4"></textarea>
                 <div class="modal-buttons">
                     <button type="button" id="cancel-button">취소</button>
@@ -46,7 +62,6 @@
             </form>
         </div>
     </div>
-
 
     <script src="script.js"></script>
 </body>
