@@ -1,280 +1,75 @@
 /* 기본 스타일 및 변수 설정 */
 :root {
-    --bg-color: #0f172a; /* 어두운 네이비 */
+    --bg-color: #0f172a;
     --primary-text-color: #e2e8f0;
     --secondary-text-color: #94a3b8;
-    --accent-color: #FFFFFF; /* 밝은 하늘색 */
+    --accent-color: #FFFFFF;
     --panel-bg-color: rgba(255, 255, 255, 0.05);
-    --glow-color: rgba(56, 189, 248, 0.6);
+    --glow-color: rgba(255, 255, 255, 0.6);
+    --timeline-hour-height: 60px; /* 시간당 높이 (매우 중요) */
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    height: 100%;
-    overflow: hidden;
-}
-
-body {
-    background-color: var(--bg-color);
-    color: var(--primary-text-color);
-    font-family: 'Noto Sans KR', sans-serif;
-}
-
-.calendar-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100dvh;
-    padding: 1rem;
-}
-
-/* 상단 네비게이터 */
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-shrink: 0;
-}
-
-#month-year {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--accent-color);
-}
-
-.nav-arrow {
-    background: none;
-    border: none;
-    color: var(--accent-color);
-    font-size: 2rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-/* 날짜 캐러셀 */
-.date-carousel {
-    position: relative;
-    overflow-x: scroll;
-    padding: 10px 0;
-    flex-shrink: 0;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-.date-carousel::-webkit-scrollbar {
-    display: none;
-}
-
-
-/* 캐러셀 좌우 페이드 아웃 효과 */
-.date-carousel::before,
-.date-carousel::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 50px;
-    z-index: 2;
-    pointer-events: none;
-}
-
-.date-carousel::before {
-    left: 0;
-    background: linear-gradient(to right, var(--bg-color), transparent);
-}
-
-.date-carousel::after {
-    right: 0;
-    background: linear-gradient(to left, var(--bg-color), transparent);
-}
-
-.dates {
-    display: flex;
-    gap: 15px;
-    cursor: grab;
-    padding: 0 10px;
-}
-
-/* ✨ [디자인 변경] 날짜 아이템 기본 스타일 */
-.date-item {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 65px;
-    height: 80px;
-    background-color: transparent; /* 배경을 완전히 투명하게 */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* 은은한 테두리 추가 */
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    user-select: none;
-}
-
-.date-item:hover {
-    border-color: rgba(255, 255, 255, 0.5); /* 호버 시 테두리 강조 */
-}
-
-/* ✨ [디자인 변경] 선택된 날짜 아이템 스타일 (빛나는 효과) */
-.date-item.active {
-    color: var(--accent-color);
-    font-weight: 700;
-    transform: scale(1.1);
-    border-color: var(--accent-color); /* 테두리 색상을 하늘색으로 변경 */
-    box-shadow: 0 0 15px 0px var(--glow-color); /* 더 세련된 글로우 효과 */
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%); /* 은은한 내부 광원 효과 추가 */
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body { background-color: var(--bg-color); color: var(--primary-text-color); font-family: 'Noto Sans KR', sans-serif; }
+.calendar-container { display: flex; flex-direction: column; width: 100%; height: 100dvh; padding: 1rem; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
+#month-year { font-size: 1.8rem; font-weight: 700; color: var(--accent-color); }
+.nav-arrow { background: none; border: none; color: var(--accent-color); font-size: 2rem; cursor: pointer; }
+.date-carousel { position: relative; overflow-x: scroll; padding: 10px 0; flex-shrink: 0; scrollbar-width: none; }
+.date-carousel::-webkit-scrollbar { display: none; }
+.date-carousel::before, .date-carousel::after { content: ''; position: absolute; top: 0; bottom: 0; width: 50px; z-index: 2; pointer-events: none; }
+.date-carousel::before { left: 0; background: linear-gradient(to right, var(--bg-color), transparent); }
+.date-carousel::after { right: 0; background: linear-gradient(to left, var(--bg-color), transparent); }
+.dates { display: flex; gap: 15px; cursor: grab; padding: 0 10px; }
+.date-item { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 65px; height: 80px; background-color: transparent; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; user-select: none; }
+.date-item:hover { border-color: rgba(255, 255, 255, 0.5); }
+.date-item.active { color: var(--accent-color); font-weight: 700; transform: scale(1.1); border-color: var(--accent-color); box-shadow: 0 0 15px 0px var(--glow-color); background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%); }
 .day-name { font-size: 0.8rem; color: var(--secondary-text-color); }
 .day-number { font-size: 1.5rem; }
+.schedule-panel { margin-top: 1rem; background-color: var(--panel-bg-color); border-radius: 15px; padding: 1.5rem; flex-grow: 1; min-height: 0; display: flex; flex-direction: column; }
+#selected-date-display { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; }
 
-/* 일정 관리 패널 */
-.schedule-panel {
-    margin-top: 1rem;
-    background-color: var(--panel-bg-color);
-    border-radius: 15px;
-    padding: 1.5rem;
-    overflow-y: auto;
-    flex-grow: 1;
-    min-height: 0;
-}
+/* ✨ [추가] 카테고리 필터 */
+.category-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; flex-shrink: 0; }
+.filter-btn { background-color: rgba(255, 255, 255, 0.1); border: 1px solid transparent; color: var(--primary-text-color); padding: 5px 12px; border-radius: 15px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
+.filter-btn.active { background-color: var(--accent-color); color: var(--bg-color); font-weight: 700; border-color: var(--accent-color); }
 
-#selected-date-display {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+/* ✨ [수정] 타임라인 */
+.timeline-container { flex-grow: 1; position: relative; overflow-y: auto; }
+.timeline { position: relative; }
+.time-slot { display: flex; height: var(--timeline-hour-height); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.time-label { width: 60px; font-size: 0.9rem; color: var(--secondary-text-color); padding-top: 5px; text-align: right; padding-right: 10px; }
+.time-slot-placeholder { flex-grow: 1; border-left: 1px solid rgba(255, 255, 255, 0.1); }
+.timeline-events { position: absolute; top: 0; left: 60px; right: 0; bottom: 0; }
+.event-item { position: absolute; left: 10px; right: 10px; background-color: rgba(255, 255, 255, 0.15); border-left: 3px solid var(--accent-color); border-radius: 4px; padding: 5px 8px; overflow: hidden; display: flex; flex-direction: column; }
+.event-item-header { display: flex; justify-content: space-between; align-items: center; }
+.event-item .category { font-weight: 700; color: var(--accent-color); }
+.event-item .memo { font-size: 0.9rem; margin-top: 4px; opacity: 0.9; }
+.delete-btn { background: none; border: none; color: var(--secondary-text-color); cursor: pointer; font-size: 1rem; }
+.delete-btn:hover { color: #ff5555; }
 
-.time-slot { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-.time-label { width: 80px; font-size: 0.9rem; color: var(--secondary-text-color); }
-.event-placeholder { flex-grow: 1; padding-left: 20px; color: #666; cursor: pointer; transition: color 0.2s; }
-.event-placeholder:hover { color: var(--primary-text-color); }
+/* 모달 */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.modal-overlay.visible { opacity: 1; visibility: visible; }
+.modal-content { background-color: var(--bg-color); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2); width: 90%; max-width: 400px; transform: scale(0.9); transition: transform 0.3s ease; }
+.modal-overlay.visible .modal-content { transform: scale(1); }
+.modal-content h3 { text-align: center; margin-bottom: 1.5rem; color: var(--accent-color); }
+#schedule-form { display: flex; flex-direction: column; gap: 1rem; }
+#schedule-form input, #schedule-form textarea { width: 100%; padding: 10px; background-color: var(--panel-bg-color); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; color: var(--primary-text-color); font-size: 1rem; }
 
-/* ✨ [추가] 일정 아이템 스타일 */
-.event-item {
-    flex-grow: 1;
-    padding: 8px 12px;
-    margin-left: 20px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-left: 3px solid var(--accent-color);
-    border-radius: 4px;
-    cursor: pointer;
-}
+/* ✨ [추가] 시간 캐러셀 스타일 */
+.time-picker-wrapper { display: flex; gap: 1rem; justify-content: space-around; }
+.time-picker-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.time-picker { display: flex; height: 120px; position: relative; }
+.time-picker::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 40px; transform: translateY(-50%); background-color: rgba(255, 255, 255, 0.1); border-radius: 5px; z-index: 0; }
+.time-carousel { height: 100%; width: 50px; overflow-y: scroll; scroll-snap-type: y mandatory; }
+.time-carousel::-webkit-scrollbar { display: none; }
+.time-item { height: 40px; display: flex; justify-content: center; align-items: center; scroll-snap-align: center; font-size: 1.2rem; }
+.time-item:first-child { margin-top: 40px; }
+.time-item:last-child { margin-bottom: 40px; }
 
-.event-item .category {
-    font-weight: 700;
-    margin-right: 8px;
-    color: var(--accent-color);
-}
-
-.event-item .memo {
-    font-size: 0.9rem;
-    color: var(--primary-text-color);
-}
-
-/* ✨ [추가] 모달 스타일 */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.modal-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background-color: var(--bg-color);
-    padding: 2rem;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    width: 90%;
-    max-width: 400px;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-}
-
-.modal-overlay.visible .modal-content {
-    transform: scale(1);
-}
-
-.modal-content h3 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: var(--accent-color);
-}
-
-#schedule-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-#schedule-form input,
-#schedule-form textarea {
-    width: 100%;
-    padding: 10px;
-    background-color: var(--panel-bg-color);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    color: var(--primary-text-color);
-    font-size: 1rem;
-}
-
-#schedule-form .time-inputs {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-#schedule-form .time-inputs label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 50%;
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.modal-buttons button {
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    font-weight: 700;
-}
-
-.modal-buttons button[type="submit"] {
-    background-color: var(--accent-color);
-    color: var(--bg-color);
-}
-
-.modal-buttons button[type="button"] {
-    background-color: #334155;
-    color: var(--primary-text-color);
-}
+.modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+.modal-buttons button { padding: 10px 20px; border-radius: 5px; border: none; font-size: 1rem; cursor: pointer; font-weight: 700; }
+.modal-buttons button[type="submit"] { background-color: var(--accent-color); color: var(--bg-color); }
+.modal-buttons button[type="button"] { background-color: #334155; color: var(--primary-text-color); }
