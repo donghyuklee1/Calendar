@@ -1,4 +1,4 @@
-/* 기본 스타일 및 변수 설정 */
+v/* 기본 스타일 및 변수 설정 */
 :root {
     --bg-color: #0f172a;
     --primary-text-color: #e2e8f0;
@@ -97,4 +97,32 @@ body { background-color: var(--bg-color); color: var(--primary-text-color); font
 .time-carousel { height: 100%; width: 50px; overflow-y: scroll; scroll-snap-type: y mandatory; cursor: grab; }
 .time-carousel:active { cursor: grabbing; }
 .time-carousel::-webkit-scrollbar { display: none; }
-.time-item { height: 40px; display: flex; justify-content: center; align-items: center; scroll-snap-align: center; font-size: 1
+.time-item { height: 40px; display: flex; justify-content: center; align-items: center; scroll-snap-align: center; font-size: 1.2rem; user-select: none; }
+.time-item:first-child { margin-top: 40px; }
+.time-item:last-child { margin-bottom: 40px; }
+.modal-buttons { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; }
+.modal-buttons button { min-width: 100px; padding: 12px 20px; border-radius: 25px; border: none; font-size: 1rem; cursor: pointer; font-weight: 700; transition: all 0.2s ease-in-out; }
+.modal-buttons button[type="submit"] { background-color: var(--accent-color); color: var(--bg-color); }
+.modal-buttons button[type="submit"]:hover { transform: scale(1.05); box-shadow: 0 0 10px -2px var(--glow-color); }
+.modal-buttons button[type="button"] { background: transparent; color: var(--secondary-text-color); border: 1px solid var(--secondary-text-color); }
+.modal-buttons button[type="button"]:hover { background-color: var(--secondary-text-color); color: var(--bg-color); }
+
+.fab { position: absolute; bottom: 2rem; right: 2rem; width: 55px; height: 55px; border-radius: 50%; background-color: var(--accent-color); color: var(--bg-color); border: none; font-size: 2rem; font-weight: 700; line-height: 55px; text-align: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); z-index: 999; transition: transform 0.2s ease-in-out; }
+.fab:hover { transform: scale(1.1); }
+
+/* ✨ [추가] 푸터 스타일 */
+.app-footer {
+    padding-top: 1rem;
+    margin-top: auto; /* main content가 확장되면서 푸터를 하단으로 밀어냄 */
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--secondary-text-color);
+    flex-shrink: 0;
+}
+
+
+@media (max-width: 480px) {
+    .time-picker-wrapper { flex-direction: column; align-items: stretch; }
+    .time-picker-container { flex-direction: row; justify-content: space-between; align-items: center; }
+    .time-picker { width: 70%; }
+}
