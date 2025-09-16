@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 애니메이션이 끝나면 캘린더 렌더링 시작
             renderAll(); 
         }, { once: true });
-    }, 2000); // 2초 후 페이드 아웃 시작
+    }, 500); // 2초 후 페이드 아웃 시작
 
 
     // ✨ 이 아래에 생략된 모든 함수들의 전체 코드를 붙여넣으시면 됩니다.
