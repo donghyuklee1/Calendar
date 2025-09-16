@@ -34,6 +34,14 @@ body { background-color: var(--bg-color); color: var(--primary-text-color); font
 .filter-btn.active { background-color: var(--accent-color); color: var(--bg-color); font-weight: 700; border-color: var(--accent-color); }
 .timeline-container { flex-grow: 1; position: relative; overflow-y: auto; }
 .timeline { position: relative; }
+.time-picker-wrapper { display: flex; gap: 1rem; justify-content: space-around; }
+.time-picker-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.time-picker { display: flex; flex-shrink: 0; height: 120px; position: relative; }
+.time-picker::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 40px; transform: translateY(-50%); background-color: rgba(255, 255, 255, 0.1); border-radius: 5px; z-index: 0; pointer-events: none; }
+.time-carousel { height: 100%; width: 50px; overflow-y: scroll; scroll-snap-type: y mandatory; cursor: grab; }
+.time-carousel:active { cursor: grabbing; }
+
+/* ... 이후 코드 ... */
 .time-slot { display: flex; height: var(--timeline-hour-height); border-bottom: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; }
 .time-label { width: 60px; font-size: 0.9rem; color: var(--secondary-text-color); padding-top: 5px; text-align: right; padding-right: 10px; }
 .time-slot-placeholder { flex-grow: 1; border-left: 1px solid rgba(255, 255, 255, 0.1); }
