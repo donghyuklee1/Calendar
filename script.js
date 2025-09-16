@@ -1,13 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM 요소 선택 ---
     const slider = document.querySelector('.carousel-slider');
+    const viewport = document.querySelector('.carousel-viewport');
     const scheduleDateDisplay = document.getElementById('schedule-date-display');
     const timelineContainer = document.getElementById('timeline-container');
-    // ... (나머지 기존 DOM 요소 선택은 동일)
+    const display = { month: document.getElementById('current-month'), year: document.getElementById('current-year') };
+    const prevMonthBtn = document.getElementById('prev-month-btn');
+    const nextMonthBtn = document.getElementById('next-month-btn');
     
     // --- 상태 변수 ---
     let currentDate = new Date();
-    // ... (나머지 기존 상태 변수는 동일)
+    const today = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+    let isDragging = false, startX, currentTranslate = 0, startTranslate, animationID;
+    let currentIndex = 0;
+    const ITEM_MARGIN = 5;
+    const MAX_ITEMS = 150, BUFFER_ITEMS = 30;
 
     // --- 일정 데이터 저장소 ---
     let events = {
@@ -18,14 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
-    // --- (핵심 수정) 타임라인 렌더링 ---
+    // --- 타임라인 렌더링 ---
     function renderTimeline(dateString) {
         const date = new Date(dateString + 'T00:00:00');
-        scheduleDateDisplay.textContent = date.toLocaleDateString('ko-KR', {
-            year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
-        });
+        scheduleDateDisplay.textContent = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
         timelineContainer.innerHTML = '';
-
         const fragment = document.createDocumentFragment();
         for (let hour = 0; hour < 24; hour++) {
             const timeSlot = document.createElement('div');
@@ -45,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fragment.appendChild(timeSlot);
         }
         timelineContainer.appendChild(fragment);
-
         const dayEvents = events[dateString] || [];
         dayEvents.forEach(event => {
             const eventItem = document.createElement('div');
@@ -57,48 +60,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetTimeLine = timelineContainer.querySelector(`.time-slot[data-hour='${Math.floor(event.start)}'] .time-line`);
             if (targetTimeLine) targetTimeLine.appendChild(eventItem);
         });
-
         timelineContainer.querySelectorAll('.time-slot').forEach(slot => {
             slot.addEventListener('click', (e) => {
                 if (e.target.classList.contains('event-item')) return;
                 const hour = slot.dataset.hour;
                 const title = prompt(`${dateString} ${hour}:00의 새 일정 제목을 입력하세요:`);
-                if (title) {
-                    addEvent(dateString, { start: parseInt(hour), duration: 1, title });
-                }
+                if (title) addEvent(dateString, { start: parseInt(hour), duration: 1, title });
             });
         });
     }
     
     function addEvent(dateString, newEvent) {
-        if (!events[dateString]) {
-            events[dateString] = [];
-        }
+        if (!events[dateString]) events[dateString] = [];
         events[dateString].push(newEvent);
         events[dateString].sort((a, b) => a.start - b.start);
         renderTimeline(dateString);
         regenerateCalendar(currentDate, currentDate.getDate());
     }
 
-    // --- 캘린더 로직 (createDateItem, snapToPosition 수정) ---
+    // --- 캘린더 로직 ---
     function createDateItem(date) {
         const item = document.createElement('div');
         item.className = 'date-item';
         const dateString = date.toISOString().split('T')[0];
         item.dataset.date = dateString;
-        if (date.getTime() === new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) item.classList.add('today');
-
+        if (date.getTime() === today.getTime()) item.classList.add('today');
         if (events[dateString] && events[dateString].length > 0) {
             const dot = document.createElement('div');
             dot.className = 'event-dot';
             item.appendChild(dot);
         }
-
-        item.innerHTML += `
-            <span class="day-of-week">${date.toLocaleString('ko-KR', { weekday: 'short' })}</span>
-            <span class="day-number">${date.getDate()}</span>
-        `;
-        
+        item.innerHTML += `<span class="day-of-week">${date.toLocaleString('ko-KR', { weekday: 'short' })}</span><span class="day-number">${date.getDate()}</span>`;
         item.addEventListener('click', () => {
             const index = Array.from(slider.children).indexOf(item);
             if (index > -1) {
@@ -106,43 +98,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 snapToPosition(true);
             }
         });
-        
         return item;
     }
 
     function snapToPosition(useAnimation = true) {
-        // ... (기존 snapToPosition 로직)
+        const totalItemWidth = getTotalItemWidth();
+        const centerOffset = (viewport.offsetWidth / 2) - (totalItemWidth / 2);
+        currentTranslate = -currentIndex * totalItemWidth + centerOffset;
+        slider.style.transition = useAnimation ? 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none';
+        slider.style.transform = `translateX(${currentTranslate}px)`;
         const activeDateEl = slider.children[currentIndex];
         if (activeDateEl) {
             const activeDate = new Date(activeDateEl.dataset.date + 'T00:00:00');
             currentDate = activeDate;
             updateHeader();
             updateTheme(currentDate.getMonth());
-            
-            // (핵심) 캐러셀이 멈출 때마다 아래 타임라인을 새로 렌더링
             renderTimeline(activeDateEl.dataset.date);
         }
-        // ... (기존 snapToPosition 로직)
+        setTimeout(updateItemsStyle, useAnimation ? 50 : 0);
     }
-
-    // --- 나머지 기존 함수들 ... ---
-    // (regenerateCalendar, updateHeader, changeMonth, 드래그/애니메이션 함수들은 이전과 동일)
     
-    function initialize() {
-        // ... (기존 initialize 로직, 스플래시 화면 관련 부분 없음)
-        regenerateCalendar(new Date(), new Date().getDate());
-        // ...
-    }
-
-    // (전체 코드를 위해 모든 함수를 포함합니다)
-    const display = { month: document.getElementById('current-month'), year: document.getElementById('current-year') };
-    const prevMonthBtn = document.getElementById('prev-month-btn');
-    const nextMonthBtn = document.getElementById('next-month-btn');
-    let isDragging = false, startX, currentTranslate = 0, startTranslate, animationID;
-    let currentIndex = 0;
-    const ITEM_MARGIN = 5;
-    const MAX_ITEMS = 150, BUFFER_ITEMS = 30;
-    const today = new Date();
+    // --- 나머지 기존 함수들 (변경 없음) ---
     function regenerateCalendar(targetDate, initialDay = 1) { currentDate = new Date(targetDate); slider.innerHTML = ''; const year = currentDate.getFullYear(), month = currentDate.getMonth(); const daysToRender = []; const baseDate = new Date(year, month, initialDay); for (let i = -BUFFER_ITEMS; i <= BUFFER_ITEMS; i++) { const date = new Date(baseDate); date.setDate(baseDate.getDate() + i); daysToRender.push(date); } slider.append(...daysToRender.map(createDateItem)); currentIndex = BUFFER_ITEMS; updateHeader(); updateTheme(month); snapToPosition(false); }
     function updateHeader() { display.month.textContent = currentDate.toLocaleString('ko-KR', { month: 'long' }); display.year.textContent = currentDate.getFullYear(); }
     function changeMonth(direction) { const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); newDate.setMonth(newDate.getMonth() + direction); regenerateCalendar(newDate); }
@@ -152,11 +128,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function drag(e) { if (!isDragging) return; if (e.type.includes('touch')) { e.preventDefault(); } const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; const diff = currentX - startX; currentTranslate = startTranslate + diff; animationID = requestAnimationFrame(updateSliderPosition); }
     function dragEnd() { if (!isDragging) return; isDragging = false; slider.classList.remove('grabbing'); cancelAnimationFrame(animationID); const totalItemWidth = getTotalItemWidth(); const movedBy = currentTranslate - startTranslate; const itemsMoved = Math.round(movedBy / totalItemWidth); currentIndex = Math.max(0, Math.min(slider.children.length - 1, currentIndex - itemsMoved)); if (currentIndex < BUFFER_ITEMS / 2) prependDays(); if (currentIndex > slider.children.length - (BUFFER_ITEMS / 2)) appendDays(); snapToPosition(true); }
     function updateSliderPosition() { slider.style.transform = `translateX(${currentTranslate}px)`; updateItemsStyle(); }
-    function snapToPosition(useAnimation = true) { const totalItemWidth = getTotalItemWidth(); const viewport = document.querySelector('.carousel-viewport'); const centerOffset = (viewport.offsetWidth / 2) - (totalItemWidth / 2); currentTranslate = -currentIndex * totalItemWidth + centerOffset; slider.style.transition = useAnimation ? 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'; slider.style.transform = `translateX(${currentTranslate}px)`; const activeDateEl = slider.children[currentIndex]; if (activeDateEl) { const activeDate = new Date(activeDateEl.dataset.date + 'T00:00:00'); currentDate = activeDate; updateHeader(); updateTheme(currentDate.getMonth()); renderTimeline(activeDateEl.dataset.date); } setTimeout(updateItemsStyle, useAnimation ? 50 : 0); }
-    function updateItemsStyle() { const viewport = document.querySelector('.carousel-viewport'); const viewportCenter = viewport.getBoundingClientRect().left + viewport.offsetWidth / 2; const totalItemWidth = getTotalItemWidth(); for (const item of slider.children) { const itemRect = item.getBoundingClientRect(); const itemCenter = itemRect.left + itemRect.width / 2; const distanceFromCenter = itemCenter - viewportCenter; const scale = Math.max(0.75, 1 - Math.abs(distanceFromCenter) * 0.0015); const rotationY = distanceFromCenter * 0.08; const opacity = Math.max(0.35, 1 - Math.abs(distanceFromCenter) * 0.004); item.style.transform = `rotateY(${rotationY}deg) scale(${scale})`; item.style.opacity = opacity; item.classList.toggle('active', Math.abs(distanceFromCenter) < totalItemWidth / 2); } }
+    function updateItemsStyle() { const viewportCenter = viewport.getBoundingClientRect().left + viewport.offsetWidth / 2; const totalItemWidth = getTotalItemWidth(); for (const item of slider.children) { const itemRect = item.getBoundingClientRect(); const itemCenter = itemRect.left + itemRect.width / 2; const distanceFromCenter = itemCenter - viewportCenter; const scale = Math.max(0.75, 1 - Math.abs(distanceFromCenter) * 0.0015); const rotationY = distanceFromCenter * 0.08; const opacity = Math.max(0.35, 1 - Math.abs(distanceFromCenter) * 0.004); item.style.transform = `rotateY(${rotationY}deg) scale(${scale})`; item.style.opacity = opacity; item.classList.toggle('active', Math.abs(distanceFromCenter) < totalItemWidth / 2); } }
     function updateTheme(month) { const root = document.documentElement; let theme = { '--bg-grad-1': '#0f3460', '--bg-grad-2': '#16213e', '--accent-color': '#5eead4' }; if ([11, 0, 1].includes(month)) { theme = {'--bg-grad-1': '#1a1a2e', '--bg-grad-2': '#16213e', '--accent-color': '#80deea'}; } else if ([2, 3, 4].includes(month)) { theme = {'--bg-grad-1': '#004d40', '--bg-grad-2': '#00695c', '--accent-color': '#84ffff'}; } else if ([5, 6, 7].includes(month)) { theme = {'--bg-grad-1': '#01579b', '--bg-grad-2': '#0277bd', '--accent-color': '#40c4ff'}; } Object.entries(theme).forEach(([key, value]) => root.style.setProperty(key, value)); }
     function getTotalItemWidth() { const itemWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--item-width')); return itemWidth + (ITEM_MARGIN * 2); }
-    function initialize() { if (!slider || !viewport || !prevMonthBtn || !nextMonthBtn) { console.error("Calendar initialization failed: One or more essential elements are missing."); return; } regenerateCalendar(new Date(), new Date().getDate()); prevMonthBtn.addEventListener('click', () => changeMonth(-1)); nextMonthBtn.addEventListener('click', () => changeMonth(1)); slider.addEventListener('mousedown', dragStart); window.addEventListener('mousemove', drag); window.addEventListener('mouseup', dragEnd); window.addEventListener('mouseleave', dragEnd); slider.addEventListener('touchstart', dragStart, { passive: true }); window.addEventListener('touchmove', drag, { passive: false }); window.addEventListener('touchend', dragEnd); window.addEventListener('resize', () => snapToPosition(false)); }
+    
+    function initialize() {
+        if (!slider || !viewport || !prevMonthBtn || !nextMonthBtn) {
+            console.error("Calendar initialization failed: One or more essential elements are missing.");
+            return;
+        }
+        regenerateCalendar(new Date(), new Date().getDate());
+        prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+        nextMonthBtn.addEventListener('click', () => changeMonth(1));
+        slider.addEventListener('mousedown', dragStart);
+        window.addEventListener('mousemove', drag);
+        window.addEventListener('mouseup', dragEnd);
+        window.addEventListener('mouseleave', dragEnd);
+        slider.addEventListener('touchstart', dragStart, { passive: true });
+        window.addEventListener('touchmove', drag, { passive: false });
+        window.addEventListener('touchend', dragEnd);
+        window.addEventListener('resize', () => snapToPosition(false));
+    }
     
     initialize();
 });
