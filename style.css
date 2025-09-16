@@ -30,33 +30,6 @@ body {
     transition: background 1.5s ease;
 }
 
-/*
-/* --- 스플래시 화면 --- */
-#splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 2rem;
-    font-weight: 700;
-    z-index: 9999;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.8s ease-out 1s, visibility 0s linear 1.8s;
-}
-
-#splash-screen.fade-out {
-    opacity: 0;
-    visibility: hidden;
-}
-*/
-
 /* --- 상단 월/연도 네비게이터 --- */
 .month-navigator {
     display: flex;
