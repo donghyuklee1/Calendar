@@ -1,147 +1,149 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM 요소 선택 ---
-    const slider = document.querySelector('.carousel-slider');
-    const viewport = document.querySelector('.carousel-viewport');
-    const scheduleDateDisplay = document.getElementById('schedule-date-display');
-    const timelineContainer = document.getElementById('timeline-container');
-    const display = { month: document.getElementById('current-month'), year: document.getElementById('current-year') };
-    const prevMonthBtn = document.getElementById('prev-month-btn');
-    const nextMonthBtn = document.getElementById('next-month-btn');
-    
-    // --- 상태 변수 ---
-    let currentDate = new Date();
-    const today = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-    let isDragging = false, startX, currentTranslate = 0, startTranslate, animationID;
-    let currentIndex = 0;
-    const ITEM_MARGIN = 5;
-    const MAX_ITEMS = 150, BUFFER_ITEMS = 30;
+    const monthYearDisplay = document.getElementById('month-year');
+    const datesContainer = document.getElementById('dates-container');
+    const selectedDateDisplay = document.getElementById('selected-date-display');
+    const timeline = document.getElementById('timeline');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
 
-    // --- 일정 데이터 저장소 ---
-    let events = {};
+    let currentDate = new Date(2025, 8, 16); // 2025년 9월 16일로 시작 (JS에서 월은 0부터 시작)
 
-    // --- 타임라인 렌더링 ---
-    function renderTimeline(dateString) {
-        const date = new Date(dateString + 'T00:00:00');
-        scheduleDateDisplay.textContent = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
-        timelineContainer.innerHTML = '';
-        const fragment = document.createDocumentFragment();
-        for (let hour = 0; hour < 24; hour++) {
+    function renderCalendar() {
+        datesContainer.innerHTML = '';
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // 1. 헤더 월/년도 업데이트
+        monthYearDisplay.textContent = `${year}년 ${month + 1}월`;
+
+        // 2. 날짜 캐러셀 생성
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateItem = document.createElement('div');
+            dateItem.className = 'date-item';
+            dateItem.dataset.date = date.toISOString().split('T')[0]; // 'YYYY-MM-DD' 형식으로 저장
+
+            const dayName = document.createElement('span');
+            dayName.className = 'day-name';
+            dayName.textContent = date.toLocaleDateString('ko-KR', { weekday: 'short' });
+            
+            const dayNumber = document.createElement('span');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = day;
+
+            dateItem.appendChild(dayName);
+            dateItem.appendChild(dayNumber);
+            datesContainer.appendChild(dateItem);
+
+            // 오늘 날짜와 선택된 날짜가 같으면 active 클래스 추가
+            if (day === currentDate.getDate()) {
+                dateItem.classList.add('active');
+            }
+
+            dateItem.addEventListener('click', () => {
+                // 기존 active 클래스 제거
+                const currentActive = datesContainer.querySelector('.active');
+                if (currentActive) {
+                    currentActive.classList.remove('active');
+                }
+                // 새로 클릭된 아이템에 active 클래스 추가
+                dateItem.classList.add('active');
+                currentDate = new Date(dateItem.dataset.date);
+                updateSchedulePanel();
+                centerActiveDate(dateItem);
+            });
+        }
+        updateSchedulePanel();
+        renderTimeline();
+        
+        // 초기 렌더링 시 선택된 날짜 중앙 정렬
+        setTimeout(() => {
+            const activeDateEl = datesContainer.querySelector('.active');
+            if(activeDateEl) centerActiveDate(activeDateEl);
+        }, 100);
+    }
+
+    function updateSchedulePanel() {
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        selectedDateDisplay.textContent = currentDate.toLocaleDateString('ko-KR', options);
+        // 여기에 선택된 날짜의 실제 일정을 불러오는 로직을 추가할 수 있습니다.
+    }
+
+    function renderTimeline() {
+        timeline.innerHTML = '';
+        for (let hour = 8; hour <= 22; hour++) {
             const timeSlot = document.createElement('div');
             timeSlot.className = 'time-slot';
-            timeSlot.dataset.hour = hour;
-            const timeLabel = document.createElement('div');
+            
+            const timeLabel = document.createElement('span');
             timeLabel.className = 'time-label';
-            if (hour > 0) {
-                const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-                const ampm = hour >= 12 ? '오후' : '오전';
-                if(hour === 12) {timeLabel.textContent = `오후 12시`;}
-                else {timeLabel.textContent = `${ampm} ${displayHour}시`;}
-            }
-            const timeLine = document.createElement('div');
-            timeLine.className = 'time-line';
-            timeSlot.append(timeLabel, timeLine);
-            fragment.appendChild(timeSlot);
+            timeLabel.textContent = `${hour}:00`;
+            
+            const eventPlaceholder = document.createElement('div');
+            eventPlaceholder.className = 'event-placeholder';
+            eventPlaceholder.textContent = '+ 새 일정 추가';
+            
+            timeSlot.appendChild(timeLabel);
+            timeSlot.appendChild(eventPlaceholder);
+            timeline.appendChild(timeSlot);
         }
-        timelineContainer.appendChild(fragment);
-        const dayEvents = events[dateString] || [];
-        dayEvents.forEach(event => {
-            const eventItem = document.createElement('div');
-            eventItem.className = 'event-item';
-            eventItem.textContent = event.title;
-            const hourHeight = 60;
-            eventItem.style.top = `${event.start * hourHeight}px`;
-            eventItem.style.height = `${event.duration * hourHeight - 2}px`;
-            const targetTimeLine = timelineContainer.querySelector(`.time-slot[data-hour='${Math.floor(event.start)}'] .time-line`);
-            if (targetTimeLine) targetTimeLine.appendChild(eventItem);
-        });
-        timelineContainer.querySelectorAll('.time-slot').forEach(slot => {
-            slot.addEventListener('click', (e) => {
-                if (e.target.classList.contains('event-item')) return;
-                const hour = slot.dataset.hour;
-                const title = prompt(`${dateString} ${hour}:00의 새 일정 제목을 입력하세요:`);
-                if (title) addEvent(dateString, { start: parseInt(hour), duration: 1, title });
-            });
-        });
     }
     
-    function addEvent(dateString, newEvent) {
-        if (!events[dateString]) events[dateString] = [];
-        events[dateString].push(newEvent);
-        events[dateString].sort((a, b) => a.start - b.start);
-        renderTimeline(dateString);
-        regenerateCalendar(currentDate, currentDate.getDate());
+    function centerActiveDate(activeElement) {
+        if (!activeElement) return;
+        const containerRect = datesContainer.getBoundingClientRect();
+        const elementRect = activeElement.getBoundingClientRect();
+        const scrollLeft = datesContainer.scrollLeft + elementRect.left - containerRect.left - (containerRect.width / 2) + (elementRect.width / 2);
+        datesContainer.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
+        });
     }
 
-    // --- 캘린더 로직 ---
-    function createDateItem(date) {
-        const item = document.createElement('div');
-        item.className = 'date-item';
-        const dateString = date.toISOString().split('T')[0];
-        item.dataset.date = dateString;
-        if (date.getTime() === today.getTime()) item.classList.add('today');
-        if (events[dateString] && events[dateString].length > 0) {
-            const dot = document.createElement('div');
-            dot.className = 'event-dot';
-            item.appendChild(dot);
-        }
-        item.innerHTML += `<span class="day-of-week">${date.toLocaleString('ko-KR', { weekday: 'short' })}</span><span class="day-number">${date.getDate()}</span>`;
-        item.addEventListener('click', () => {
-            const index = Array.from(slider.children).indexOf(item);
-            if (index > -1) {
-                currentIndex = index;
-                snapToPosition(true);
-            }
-        });
-        return item;
-    }
+    // 월 이동 버튼 이벤트 리스너
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
 
-    function snapToPosition(useAnimation = true) {
-        const totalItemWidth = getTotalItemWidth();
-        const centerOffset = (viewport.offsetWidth / 2) - (totalItemWidth / 2);
-        currentTranslate = -currentIndex * totalItemWidth + centerOffset;
-        slider.style.transition = useAnimation ? 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none';
-        slider.style.transform = `translateX(${currentTranslate}px)`;
-        const activeDateEl = slider.children[currentIndex];
-        if (activeDateEl) {
-            const activeDate = new Date(activeDateEl.dataset.date + 'T00:00:00');
-            currentDate = activeDate;
-            updateHeader();
-            updateTheme(currentDate.getMonth());
-            renderTimeline(activeDateEl.dataset.date);
-        }
-        setTimeout(updateItemsStyle, useAnimation ? 50 : 0);
-    }
+    nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    // 드래그 스크롤 기능 추가
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    datesContainer.addEventListener('mousedown', (e) => {
+        isDown = true;
+        datesContainer.style.cursor = 'grabbing';
+        startX = e.pageX - datesContainer.offsetLeft;
+        scrollLeft = datesContainer.scrollLeft;
+    });
+
+    datesContainer.addEventListener('mouseleave', () => {
+        isDown = false;
+        datesContainer.style.cursor = 'grab';
+    });
+
+    datesContainer.addEventListener('mouseup', () => {
+        isDown = false;
+        datesContainer.style.cursor = 'grab';
+    });
+
+    datesContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - datesContainer.offsetLeft;
+        const walk = (x - startX) * 2; // 스크롤 속도 조절
+        datesContainer.scrollLeft = scrollLeft - walk;
+    });
     
-    function regenerateCalendar(targetDate, initialDay = 1) { currentDate = new Date(targetDate); slider.innerHTML = ''; const year = currentDate.getFullYear(), month = currentDate.getMonth(); const daysToRender = []; const baseDate = new Date(year, month, initialDay); for (let i = -BUFFER_ITEMS; i <= BUFFER_ITEMS; i++) { const date = new Date(baseDate); date.setDate(baseDate.getDate() + i); daysToRender.push(date); } slider.append(...daysToRender.map(createDateItem)); currentIndex = BUFFER_ITEMS; updateHeader(); updateTheme(month); snapToPosition(false); }
-    function updateHeader() { display.month.textContent = currentDate.toLocaleString('ko-KR', { month: 'long' }); display.year.textContent = currentDate.getFullYear(); }
-    function changeMonth(direction) { const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); newDate.setMonth(newDate.getMonth() + direction); regenerateCalendar(newDate); }
-    function prependDays() { const firstItem = slider.firstElementChild; if (!firstItem) return; const firstDate = new Date(firstItem.dataset.date + 'T00:00:00'); const itemsToAdd = []; for (let i = 0; i < BUFFER_ITEMS; i++) { const newDate = new Date(firstDate); newDate.setDate(firstDate.getDate() - (BUFFER_ITEMS - i)); itemsToAdd.push(createDateItem(newDate)); } slider.prepend(...itemsToAdd); const totalItemWidth = getTotalItemWidth(); const widthAdded = BUFFER_ITEMS * totalItemWidth; currentTranslate += widthAdded; startTranslate += widthAdded; currentIndex += BUFFER_ITEMS; slider.style.transform = `translateX(${currentTranslate}px)`; while (slider.children.length > MAX_ITEMS) { slider.lastElementChild.remove(); } }
-    function appendDays() { const lastItem = slider.lastElementChild; if (!lastItem) return; const lastDate = new Date(lastItem.dataset.date + 'T00:00:00'); const itemsToAdd = []; for (let i = 1; i <= BUFFER_ITEMS; i++) { const newDate = new Date(lastDate); newDate.setDate(lastDate.getDate() + i); itemsToAdd.push(createDateItem(newDate)); } slider.append(...itemsToAdd); const totalItemWidth = getTotalItemWidth(); while (slider.children.length > MAX_ITEMS) { slider.firstElementChild.remove(); currentTranslate -= totalItemWidth; startTranslate -= totalItemWidth; currentIndex--; } }
-    function dragStart(e) { isDragging = true; startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; startTranslate = currentTranslate; slider.classList.add('grabbing'); cancelAnimationFrame(animationID); }
-    function drag(e) { if (!isDragging) return; if (e.type.includes('touch')) { e.preventDefault(); } const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; const diff = currentX - startX; currentTranslate = startTranslate + diff; animationID = requestAnimationFrame(updateSliderPosition); }
-    function dragEnd() { if (!isDragging) return; isDragging = false; slider.classList.remove('grabbing'); cancelAnimationFrame(animationID); const totalItemWidth = getTotalItemWidth(); const movedBy = currentTranslate - startTranslate; const itemsMoved = Math.round(movedBy / totalItemWidth); currentIndex = Math.max(0, Math.min(slider.children.length - 1, currentIndex - itemsMoved)); if (currentIndex < BUFFER_ITEMS / 2) prependDays(); if (currentIndex > slider.children.length - (BUFFER_ITEMS / 2)) appendDays(); snapToPosition(true); }
-    function updateSliderPosition() { slider.style.transform = `translateX(${currentTranslate}px)`; updateItemsStyle(); }
-    function updateItemsStyle() { const viewportCenter = viewport.getBoundingClientRect().left + viewport.offsetWidth / 2; const totalItemWidth = getTotalItemWidth(); for (const item of slider.children) { const itemRect = item.getBoundingClientRect(); const itemCenter = itemRect.left + itemRect.width / 2; const distanceFromCenter = itemCenter - viewportCenter; const scale = Math.max(0.75, 1 - Math.abs(distanceFromCenter) * 0.0015); const rotationY = distanceFromCenter * 0.08; const opacity = Math.max(0.35, 1 - Math.abs(distanceFromCenter) * 0.004); item.style.transform = `rotateY(${rotationY}deg) scale(${scale})`; item.style.opacity = opacity; item.classList.toggle('active', Math.abs(distanceFromCenter) < totalItemWidth / 2); } }
-    function updateTheme(month) { const root = document.documentElement; let theme = { '--bg-grad-1': '#0f172a', '--bg-grad-2': '#1e293b', '--accent-color': '#38bdf8', '--accent-glow': 'rgba(56, 189, 248, 0.5)' }; Object.entries(theme).forEach(([key, value]) => root.style.setProperty(key, value)); }
-    function getTotalItemWidth() { const itemWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--item-width')); return itemWidth + (ITEM_MARGIN * 2); }
-    
-    function initialize() {
-        if (!slider || !viewport || !prevMonthBtn || !nextMonthBtn) {
-            console.error("Calendar initialization failed: One or more essential elements are missing.");
-            return;
-        }
-        regenerateCalendar(new Date(), new Date().getDate());
-        prevMonthBtn.addEventListener('click', () => changeMonth(-1));
-        nextMonthBtn.addEventListener('click', () => changeMonth(1));
-        slider.addEventListener('mousedown', dragStart);
-        window.addEventListener('mousemove', drag);
-        window.addEventListener('mouseup', dragEnd);
-        window.addEventListener('mouseleave', dragEnd);
-        slider.addEventListener('touchstart', dragStart, { passive: true });
-        window.addEventListener('touchmove', drag, { passive: false });
-        window.addEventListener('touchend', dragEnd);
-        window.addEventListener('resize', () => snapToPosition(false));
-    }
-    
-    initialize();
+    // 초기 렌더링
+    renderCalendar();
 });
