@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM 요소
-    const addScheduleBtn = document.getElementById('add-schedule-btn');
     const monthYearDisplay = document.getElementById('month-year');
     const datesContainer = document.getElementById('dates-container');
     const carousel = document.querySelector('.date-carousel');
@@ -13,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
     const cancelButton = document.getElementById('cancel-button');
+    const addScheduleBtn = document.getElementById('add-schedule-btn'); // ✨ 버튼 요소 추가
 
     // 상태 변수
     let currentDate = new Date();
@@ -35,14 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const minutesCarousel = document.getElementById(`${type}-minutes`);
             hoursCarousel.innerHTML = '';
             minutesCarousel.innerHTML = '';
-
             for (let i = 0; i < 24; i++) {
                 const item = document.createElement('div');
                 item.className = 'time-item hour-item';
                 item.textContent = String(i).padStart(2, '0');
                 hoursCarousel.appendChild(item);
             }
-            for (let i = 0; i < 60; i += 5) { // 5분 단위
+            for (let i = 0; i < 60; i += 5) {
                 const item = document.createElement('div');
                 item.className = 'time-item minute-item';
                 item.textContent = String(i).padStart(2, '0');
@@ -69,15 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(hour = null) {
         scheduleForm.reset();
         const dateKey = toYYYYMMDD(currentDate);
-
-        let startHour;
-        // hour 값이 넘어오면 그 시간을, 아니면 현재 시간을 기본값으로 설정
-        if (hour !== null) {
-            startHour = hour;
-        } else {
-            startHour = new Date().getHours();
-        }
-
+        let startHour = (hour !== null) ? hour : new Date().getHours();
         setSelectedTime('start', `${String(startHour).padStart(2, '0')}:00`);
         setSelectedTime('end', `${String(startHour + 1).padStart(2, '0')}:00`);
         modal.dataset.date = dateKey;
@@ -112,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         monthYearDisplay.textContent = `${year}년 ${month + 1}월`;
-
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
@@ -135,61 +125,44 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderTimeline() {
         timeline.innerHTML = '';
         timelineEvents.innerHTML = '';
-        
         const timelineContainer = document.querySelector('.timeline-container');
-        
         for (let hour = 0; hour < 24; hour++) {
             const timeSlot = document.createElement('div');
             timeSlot.className = 'time-slot';
             timeSlot.innerHTML = `<div class="time-label">${hour}:00</div><div class="time-slot-placeholder"></div>`;
-            timeSlot.addEventListener('click', () => openModal(hour));
+            timeSlot.addEventListener('click', () => openModal(hour)); // ✨ 빈 슬롯 클릭 시 해당 시간으로 모달 열기
             timeline.appendChild(timeSlot);
         }
-
         const dateKey = toYYYYMMDD(currentDate);
         const dailySchedules = schedules[dateKey] || [];
-        
         const filteredSchedules = activeFilter === 'all' 
             ? dailySchedules 
             : dailySchedules.filter(s => s.category === activeFilter);
-
         filteredSchedules.forEach(schedule => {
             const [startHour, startMinute] = schedule.startTime.split(':').map(Number);
             const [endHour, endMinute] = schedule.endTime.split(':').map(Number);
-            
             const top = (startHour * HOUR_HEIGHT) + (startMinute / 60 * HOUR_HEIGHT);
             const endTop = (endHour * HOUR_HEIGHT) + (endMinute / 60 * HOUR_HEIGHT);
             let height = endTop - top;
-            if (height < 20) height = 20; // 최소 높이 설정
-
+            if (height < 20) height = 20;
             const eventItem = document.createElement('div');
             eventItem.className = 'event-item';
             eventItem.style.top = `${top}px`;
             eventItem.style.height = `${height}px`;
-            
-            eventItem.innerHTML = `
-                <div class="event-item-header">
-                    <span class="category">${schedule.category}</span>
-                    <button class="delete-btn" data-id="${schedule.id}">&times;</button>
-                </div>
-                <span class="memo">${schedule.memo}</span>
-            `;
+            eventItem.innerHTML = `<div class="event-item-header"><span class="category">${schedule.category}</span><button class="delete-btn" data-id="${schedule.id}">&times;</button></div><span class="memo">${schedule.memo}</span>`;
             timelineEvents.appendChild(eventItem);
         });
-        
-        timelineContainer.scrollTop = 8 * HOUR_HEIGHT; // 오전 8시로 스크롤
+        timelineContainer.scrollTop = 8 * HOUR_HEIGHT;
     }
 
     function renderCategoryFilters() {
         categoryFiltersContainer.innerHTML = '';
         const allCategories = new Set(Object.values(schedules).flat().map(s => s.category));
-        
         const allBtn = document.createElement('button');
         allBtn.className = 'filter-btn' + (activeFilter === 'all' ? ' active' : '');
         allBtn.textContent = '전체';
         allBtn.dataset.category = 'all';
         categoryFiltersContainer.appendChild(allBtn);
-
         allCategories.forEach(category => {
             if (!category) return;
             const btn = document.createElement('button');
@@ -215,11 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('종료 시간은 시작 시간보다 늦어야 합니다.');
             return;
         }
-
         if (!schedules[date]) schedules[date] = [];
         schedules[date].push(newSchedule);
         schedules[date].sort((a, b) => a.startTime.localeCompare(b.startTime));
-        
         saveSchedules();
         closeModal();
         renderTimeline();
@@ -229,11 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleDelete(e) {
         if (!e.target.classList.contains('delete-btn')) return;
         if (!confirm('일정을 삭제하시겠습니까?')) return;
-        
         const dateKey = toYYYYMMDD(currentDate);
         const scheduleId = Number(e.target.dataset.id);
         schedules[dateKey] = schedules[dateKey].filter(s => s.id !== scheduleId);
-        
         saveSchedules();
         renderTimeline();
         renderCategoryFilters();
@@ -247,9 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- 유틸리티 및 헬퍼 함수 ---
-    function toYYYYMMDD(date) {
-        return date.toISOString().split('T')[0];
-    }
+    function toYYYYMMDD(date) { return date.toISOString().split('T')[0]; }
     
     let isDragging = false;
     function addDateClickListeners() {
@@ -272,15 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 이벤트 리스너 등록 ---
-    addScheduleBtn.addEventListener('click', () => openModal());
     scheduleForm.addEventListener('submit', handleScheduleSubmit);
     cancelButton.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
     timelineEvents.addEventListener('click', handleDelete);
     categoryFiltersContainer.addEventListener('click', handleFilterClick);
-    
     prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderAll(); });
     nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderAll(); });
+    addScheduleBtn.addEventListener('click', () => openModal()); // ✨ 버튼 클릭 리스너
 
     // 드래그 & 스와이프 기능
     let isDown = false, startX, scrollLeft;
