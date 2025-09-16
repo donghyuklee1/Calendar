@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="splash-screen" class="splash-screen">
+        <h1 class="splash-title">Donghyuk's Calendar</h1>
+    </div>
+
     <div class="calendar-container">
         <header class="calendar-header">
             <button id="prev-month" class="nav-arrow" aria-label="이전 달">&lt;</button>
@@ -31,6 +35,10 @@
         </main>
 
         <button id="add-schedule-btn" class="fab" aria-label="새 일정 추가">+</button>
+
+        <footer class="app-footer">
+            <p>&copy; 2025 Donghyuk Lee</p>
+        </footer>
     </div>
 
     <div id="schedule-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
