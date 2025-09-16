@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 상수
     const HOUR_HEIGHT = 60;
+    const eventColors = [ { hex: '#FFFFFF', rgb: '255, 255, 255' }, { hex: '#84cc16', rgb: '132, 204, 22' }, { hex: '#38bdf8', rgb: '56, 189, 248' }, { hex: '#f97316', rgb: '249, 115, 22' }, { hex: '#a855f7', rgb: '168, 85, 247' }, { hex: '#ec4899', rgb: '236, 72, 153' } ];
 
     // --- 데이터 관리 ---
     function saveSchedules() {
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`${type}-minutes`).scrollTop = Math.round(minute / 5) * 40;
     }
 
-    // --- 모달 관련 (접근성 강화) ---
+    // --- 모달 관련 ---
     function openModal(hour = null) {
         lastFocusedElement = document.activeElement;
         scheduleForm.reset();
@@ -153,6 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
             eventItem.className = 'event-item';
             eventItem.style.top = `${top}px`;
             eventItem.style.height = `${height}px`;
+            const color = schedule.color || eventColors[0];
+            eventItem.style.setProperty('--event-color', color.hex);
+            eventItem.style.setProperty('--event-rgb-color', color.rgb);
             eventItem.innerHTML = `<div class="event-item-header"><span class="category">${schedule.category}</span><button class="delete-btn" data-id="${schedule.id}">&times;</button></div><span class="memo">${schedule.memo}</span>`;
             timelineEvents.appendChild(eventItem);
         });
@@ -181,12 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleScheduleSubmit(e) {
         e.preventDefault();
         const date = modal.dataset.date;
+        const currentSchedules = schedules[date] || [];
+        const colorIndex = currentSchedules.length % eventColors.length;
+        const color = eventColors[colorIndex];
         const newSchedule = {
             id: Date.now(),
             category: document.getElementById('schedule-category').value || "#기타",
             startTime: getSelectedTime('start'),
             endTime: getSelectedTime('end'),
             memo: document.getElementById('schedule-memo').value,
+            color: color
         };
         if (newSchedule.startTime >= newSchedule.endTime) {
             alert('종료 시간은 시작 시간보다 늦어야 합니다.');
@@ -220,24 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function handleModalKeydown(e) {
-        if (e.key === 'Escape') {
-            closeModal();
-            return;
-        }
+        if (e.key === 'Escape') { closeModal(); return; }
         if (e.key === 'Tab') {
             const focusableElements = Array.from(modal.querySelectorAll('input, textarea, button'));
             const firstElement = focusableElements[0];
             const lastElement = focusableElements[focusableElements.length - 1];
             if (e.shiftKey) {
-                if (document.activeElement === firstElement) {
-                    e.preventDefault();
-                    lastElement.focus();
-                }
+                if (document.activeElement === firstElement) { e.preventDefault(); lastElement.focus(); }
             } else {
-                if (document.activeElement === lastElement) {
-                    e.preventDefault();
-                    firstElement.focus();
-                }
+                if (document.activeElement === lastElement) { e.preventDefault(); firstElement.focus(); }
             }
         }
     }
@@ -247,10 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function addDateClickListeners() {
         document.querySelectorAll('.date-item').forEach(item => {
-            item.addEventListener('click', () => {
-                if (isDragging) return;
-                setActiveDate(item);
-            });
+            item.addEventListener('click', () => { if (isDragging) return; setActiveDate(item); });
         });
     }
 
@@ -273,9 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const t = Math.min(elapsed / duration, 1);
             const easedT = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
             element.scrollLeft = start + change * easedT;
-            if (elapsed < duration) {
-                requestAnimationFrame(animateScroll);
-            }
+            if (elapsed < duration) { requestAnimationFrame(animateScroll); }
         }
         requestAnimationFrame(animateScroll);
     }
@@ -283,11 +277,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function centerActiveDate(activeElement, behavior = 'smooth') {
         if (!activeElement) return;
         const scrollLeft = activeElement.offsetLeft - (carousel.offsetWidth / 2) + (activeElement.offsetWidth / 2);
-        if (behavior === 'smooth') {
-            smoothScrollTo(carousel, scrollLeft, 400);
-        } else {
-            carousel.scrollLeft = scrollLeft;
-        }
+        if (behavior === 'smooth') { smoothScrollTo(carousel, scrollLeft, 400); } 
+        else { carousel.scrollLeft = scrollLeft; }
     }
 
     function makeDraggable(element, options = { direction: 'horizontal' }) {
@@ -301,9 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const endDrag = () => {
             isDown = false;
             element.classList.remove('active-drag');
-            if (options.direction === 'horizontal') {
-                snapToNearestDate();
-            }
+            if (options.direction === 'horizontal') { snapToNearestDate(); }
         };
         const doDrag = (e) => {
             if (!isDown) return;
@@ -311,11 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isDragging = true;
             const pos = options.direction === 'horizontal' ? e.pageX - element.offsetLeft : e.pageY - element.offsetTop;
             const walk = (pos - startPos) * 1.5;
-            if (options.direction === 'horizontal') {
-                element.scrollLeft = scrollPos - walk;
-            } else {
-                element.scrollTop = scrollPos - walk;
-            }
+            if (options.direction === 'horizontal') { element.scrollLeft = scrollPos - walk; } 
+            else { element.scrollTop = scrollPos - walk; }
         };
         element.addEventListener('mousedown', startDrag);
         element.addEventListener('mouseleave', endDrag);
@@ -339,11 +325,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 closestItem = item;
             }
         });
-        if (closestItem) {
-            setActiveDate(closestItem);
-        }
+        if (closestItem) { setActiveDate(closestItem); }
     }
 
+    // --- 이벤트 리스너 등록 ---
+    scheduleForm.addEventListener('submit', handleScheduleSubmit);
+    cancelButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    timelineEvents.addEventListener('click', handleDelete);
+    categoryFiltersContainer.addEventListener('click', handleFilterClick);
+    prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderAll(); });
+    nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderAll(); });
+    addScheduleBtn.addEventListener('click', () => openModal());
+    modal.addEventListener('keydown', handleModalKeydown);
+    
     // --- 초기 실행 ---
     populateTimeCarousels();
     makeDraggable(carousel, { direction: 'horizontal' });
