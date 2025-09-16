@@ -107,7 +107,7 @@ body { background-color: var(--bg-color); color: var(--primary-text-color); font
     font-weight: 700;
     color: var(--accent-color);
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    animation: pulse 0.5s;
+    animation: pulse 1.5s infinite-state;
 }
 
 @keyframes pulse {
