@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
     const cancelButton = document.getElementById('cancel-button');
-    const addScheduleBtn = document.getElementById('add-schedule-btn'); // ✨ 버튼 요소 추가
+    const addScheduleBtn = document.getElementById('add-schedule-btn');
 
     // 상태 변수
     let currentDate = new Date();
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeFilter = 'all';
 
     // 상수
-    const HOUR_HEIGHT = 60; // CSS의 --timeline-hour-height와 동일해야 함
+    const HOUR_HEIGHT = 60;
 
     // --- 데이터 관리 ---
     function saveSchedules() {
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeSlot = document.createElement('div');
             timeSlot.className = 'time-slot';
             timeSlot.innerHTML = `<div class="time-label">${hour}:00</div><div class="time-slot-placeholder"></div>`;
-            timeSlot.addEventListener('click', () => openModal(hour)); // ✨ 빈 슬롯 클릭 시 해당 시간으로 모달 열기
+            timeSlot.addEventListener('click', () => openModal(hour));
             timeline.appendChild(timeSlot);
         }
         const dateKey = toYYYYMMDD(currentDate);
@@ -238,29 +238,36 @@ document.addEventListener('DOMContentLoaded', () => {
         carousel.scrollTo({ left: scrollLeft, behavior: 'smooth' });
     }
 
+    // ✨ [추가] 드래그 기능 함수
+    function makeDraggable(element, options = { direction: 'horizontal' }) {
+        let isDown = false, startPos, scrollPos;
+        
+        element.addEventListener('mousedown', (e) => {
+            isDown = true;
+            element.classList.add('active-drag');
+            startPos = options.direction === 'horizontal' ? e.pageX - element.offsetLeft : e.pageY - element.offsetTop;
+            scrollPos = options.direction === 'horizontal' ? element.scrollLeft : element.scrollTop;
+        });
+
+        element.addEventListener('mouseleave', () => { isDown = false; element.classList.remove('active-drag'); });
+        element.addEventListener('mouseup', () => { isDown = false; element.classList.remove('active-drag'); });
+        
+        element.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const pos = options.direction === 'horizontal' ? e.pageX - element.offsetLeft : e.pageY - element.offsetTop;
+            const walk = (pos - startPos) * 1.5;
+            if (options.direction === 'horizontal') {
+                element.scrollLeft = scrollPos - walk;
+                isDragging = true; setTimeout(() => isDragging = false, 50);
+            } else {
+                element.scrollTop = scrollPos - walk;
+            }
+        });
+    }
+
     // --- 이벤트 리스너 등록 ---
     scheduleForm.addEventListener('submit', handleScheduleSubmit);
     cancelButton.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-    timelineEvents.addEventListener('click', handleDelete);
-    categoryFiltersContainer.addEventListener('click', handleFilterClick);
-    prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderAll(); });
-    nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderAll(); });
-    addScheduleBtn.addEventListener('click', () => openModal()); // ✨ 버튼 클릭 리스너
-
-    // 드래그 & 스와이프 기능
-    let isDown = false, startX, scrollLeft;
-    const startDrag = (e) => { isDown = true; isDragging = false; datesContainer.style.cursor = 'grabbing'; startX = (e.pageX || e.touches[0].pageX) - carousel.offsetLeft; scrollLeft = carousel.scrollLeft; };
-    const endDrag = () => { isDown = false; datesContainer.style.cursor = 'grab'; setTimeout(() => isDragging = false, 10); };
-    const doDrag = (e) => { if (!isDown) return; e.preventDefault(); isDragging = true; const x = (e.pageX || e.touches[0].pageX) - carousel.offsetLeft; const walk = (x - startX) * 1.5; carousel.scrollLeft = scrollLeft - walk; };
-    carousel.addEventListener('mousedown', startDrag);
-    carousel.addEventListener('mouseleave', endDrag);
-    carousel.addEventListener('mouseup', endDrag);
-    carousel.addEventListener('touchstart', startDrag, { passive: true });
-    carousel.addEventListener('touchend', endDrag);
-    carousel.addEventListener('touchmove', doDrag);
-    
-    // --- 초기 실행 ---
-    populateTimeCarousels();
-    renderAll();
-});
+    timelineEvents.addEventListener
