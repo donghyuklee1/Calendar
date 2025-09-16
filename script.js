@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM 요소
+    const addScheduleBtn = document.getElementById('add-schedule-btn');
     const monthYearDisplay = document.getElementById('month-year');
     const datesContainer = document.getElementById('dates-container');
     const carousel = document.querySelector('.date-carousel');
@@ -65,13 +66,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 모달 관련 ---
-    function openModal() {
+    function openModal(hour = null) {
         scheduleForm.reset();
         const dateKey = toYYYYMMDD(currentDate);
-        const now = new Date();
-        const startHour = now.getHours();
-        setSelectedTime('start', `${startHour}:00`);
-        setSelectedTime('end', `${startHour + 1}:00`);
+
+        let startHour;
+        // hour 값이 넘어오면 그 시간을, 아니면 현재 시간을 기본값으로 설정
+        if (hour !== null) {
+            startHour = hour;
+        } else {
+            startHour = new Date().getHours();
+        }
+
+        setSelectedTime('start', `${String(startHour).padStart(2, '0')}:00`);
+        setSelectedTime('end', `${String(startHour + 1).padStart(2, '0')}:00`);
         modal.dataset.date = dateKey;
         modal.classList.add('visible');
     }
@@ -134,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeSlot = document.createElement('div');
             timeSlot.className = 'time-slot';
             timeSlot.innerHTML = `<div class="time-label">${hour}:00</div><div class="time-slot-placeholder"></div>`;
-            timeSlot.addEventListener('click', openModal);
+            timeSlot.addEventListener('click', () => openModal(hour));
             timeline.appendChild(timeSlot);
         }
 
@@ -264,6 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 이벤트 리스너 등록 ---
+    addScheduleBtn.addEventListener('click', () => openModal());
     scheduleForm.addEventListener('submit', handleScheduleSubmit);
     cancelButton.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
