@@ -80,18 +80,4 @@ body {
 .time-slot { display: flex; min-height: 60px; border-top: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; }
 .time-label { flex-shrink: 0; width: 50px; font-size: 0.8rem; color: var(--text-secondary); position: relative; top: -0.6em; padding-right: 10px; }
 .time-line { flex-grow: 1; position: relative; }
-.event-item { position: absolute; left: 5px; right: 5px; background-color: var(--accent-color); border-radius: 6px; padding: 0.3rem 0.6rem; box-sizing: border-box; color: #111; font-weight: 600; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 10; }
-
-/* --- 푸터 --- */
-.site-footer { flex-shrink: 0; padding: 1rem 0; font-size: 0.9rem; color: var(--text-secondary); opacity: 0.8; }
-
-/* --- 모바일 최적화 --- */
-@media (max-width: 375px) {
-    :root { --item-width: 70px; --item-height: 100px; }
-    .month-navigator { padding-top: 1rem; margin-bottom: 1.5rem; }
-    #current-month { font-size: 2rem; }
-    .nav-btn { font-size: 2.5rem; padding: 0 0.5rem; }
-    .date-item .day-number { font-size: 1.8rem; }
-    .schedule-container { padding: 1rem; }
-    #schedule-date-display { font-size: 1.2rem; }
-}
+.event-item { position: absolute; left: 5px; right: 5px; background-color: var(--accent-color); border-radius
