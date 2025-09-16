@@ -14,20 +14,24 @@
     box-sizing: border-box;
 }
 
+/* 뷰포트를 꽉 채우도록 변경 */
+html, body {
+    height: 100%;
+    overflow: hidden; /* 전체 페이지 스크롤 방지 */
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--primary-text-color);
     font-family: 'Noto Sans KR', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
 }
 
+/* 컨테이너를 flex column으로 설정하여 화면 전체 사용 */
 .calendar-container {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    max-width: 800px;
+    height: 100vh; /* 화면 전체 높이 사용 */
     padding: 20px;
 }
 
@@ -37,6 +41,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-shrink: 0; /* 높이가 줄어들지 않도록 설정 */
 }
 
 #month-year {
@@ -61,9 +66,17 @@ body {
 /* 날짜 캐러셀 */
 .date-carousel {
     position: relative;
-    overflow: hidden;
+    overflow-x: scroll; /* 가로 스크롤 가능하게 변경 */
     padding: 10px 0;
+    flex-shrink: 0; /* 높이가 줄어들지 않도록 설정 */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
+/* Chrome, Safari, Opera */
+.date-carousel::-webkit-scrollbar {
+    display: none;
+}
+
 
 /* 캐러셀 좌우 페이드 아웃 효과 */
 .date-carousel::before,
@@ -74,7 +87,7 @@ body {
     bottom: 0;
     width: 60px;
     z-index: 2;
-    pointer-events: none; /* 그라데이션 뒤의 요소 클릭 가능하게 */
+    pointer-events: none;
 }
 
 .date-carousel::before {
@@ -90,7 +103,8 @@ body {
 .dates {
     display: flex;
     gap: 15px;
-    transition: transform 0.5s ease-in-out; /* 부드러운 슬라이드 효과 */
+    cursor: grab; /* 드래그 가능함을 암시하는 커서 */
+    padding: 0 10px; /* 좌우 여백 추가 */
 }
 
 .date-item {
@@ -105,6 +119,7 @@ body {
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+    user-select: none; /* 텍스트 드래그 방지 */
 }
 
 .date-item:hover {
@@ -115,26 +130,21 @@ body {
     color: var(--accent-color);
     font-weight: 700;
     transform: scale(1.1);
-    box-shadow: 0 0 20px var(--glow-color); /* 글로우 효과 */
+    box-shadow: 0 0 20px var(--glow-color);
 }
 
-.day-name {
-    font-size: 0.8rem;
-    color: var(--secondary-text-color);
-}
-
-.day-number {
-    font-size: 1.5rem;
-}
+.day-name { font-size: 0.8rem; color: var(--secondary-text-color); }
+.day-number { font-size: 1.5rem; }
 
 /* 일정 관리 패널 */
 .schedule-panel {
-    margin-top: 30px;
+    margin-top: 20px;
     background-color: var(--panel-bg-color);
     border-radius: 15px;
     padding: 25px;
-    height: 400px; /* 고정 높이 */
     overflow-y: auto; /* 내용이 많아지면 스크롤 */
+    flex-grow: 1; /* 남은 공간을 모두 차지하도록 설정 */
+    min-height: 0; /* flex 아이템이 부모를 넘치지 않게 함 */
 }
 
 #selected-date-display {
@@ -145,26 +155,7 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.time-slot {
-    display: flex;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.time-label {
-    width: 80px;
-    font-size: 0.9rem;
-    color: var(--secondary-text-color);
-}
-
-.event-placeholder {
-    flex-grow: 1;
-    padding-left: 20px;
-    color: #666;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.event-placeholder:hover {
-    color: var(--primary-text-color);
-}
+.time-slot { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+.time-label { width: 80px; font-size: 0.9rem; color: var(--secondary-text-color); }
+.event-placeholder { flex-grow: 1; padding-left: 20px; color: #666; cursor: pointer; transition: color 0.2s; }
+.event-placeholder:hover { color: var(--primary-text-color); }
