@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return newColor;
     }
 
-    // --- 시간 캐러셀 관련 ---
+    // --- 시간 캐러셀 ---
     function populateTimeCarousels() {
         ['start', 'end'].forEach(type => {
             const hoursCarousel = document.getElementById(`${type}-hours`);
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`${type}-minutes`).scrollTop = Math.round(minute / 5) * 40;
     }
 
-    // --- 모달 관련 ---
+    // --- 모달 ---
     function openModal(hour = null) {
         lastFocusedElement = document.activeElement;
         scheduleForm.reset();
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             location: document.getElementById('schedule-location').value,
             startTime: getSelectedTime('start'),
             endTime: getSelectedTime('end'),
-            memo: document.getElementById('schedule-memo').value
+            memo: document.getElementById('schedule-memo').value,
         };
         if (newSchedule.startTime >= newSchedule.endTime) {
             alert('종료 시간은 시작 시간보다 늦어야 합니다.');
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addScheduleBtn.addEventListener('click', () => openModal());
     scheduleModal.addEventListener('keydown', (e) => handleModalKeydown(scheduleModal, e));
     detailsModal.addEventListener('keydown', (e) => handleModalKeydown(detailsModal, e));
-
+    
     // --- 초기 실행 ---
     populateTimeCarousels();
     makeDraggable(carousel, { direction: 'horizontal' });
@@ -381,26 +381,10 @@ document.addEventListener('DOMContentLoaded', () => {
         makeDraggable(tc, { direction: 'vertical' });
     });
     
-    // 스플래시 화면 제어
-    setTimeout(() => {
-        const splashScreen = document.getElementById('splash-screen');
-        if (splashScreen) {
-            splashScreen.classList.add('fade-out');
-            splashScreen.addEventListener('transitionend', () => {
-                // ✨ 이 부분이 중요합니다. 애니메이션이 끝나면 화면을 숨깁니다.
-                splashScreen.style.display = 'none'; 
-                renderAll(); 
-            }, { once: true });
-        } else {
-            // 스플래시 스크린이 없는 경우 바로 렌더링
-            renderAll();
-        }
-    }, 500); // 0.5초 후 페이드 아웃 시작
-    
     setTimeout(() => {
         splashScreen.classList.add('fade-out');
         splashScreen.addEventListener('transitionend', () => {
             renderAll(); 
         }, { once: true });
-    }, 1500);
+    }, 500);
 });
