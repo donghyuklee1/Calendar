@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM 요소
-    const splashScreen = document.getElementById('splash-screen');
     const monthYearDisplay = document.getElementById('month-year');
     const datesContainer = document.getElementById('dates-container');
     const carousel = document.querySelector('.date-carousel');
@@ -18,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 상태 변수
     let currentDate = new Date();
     let schedules = JSON.parse(localStorage.getItem('schedules')) || {};
+    let categoryColors = JSON.parse(localStorage.getItem('categoryColors')) || {};
     let activeFilter = 'all';
     let isDragging = false;
     let lastFocusedElement;
@@ -30,20 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveSchedules() {
         localStorage.setItem('schedules', JSON.stringify(schedules));
     }
-
     function saveCategoryColors() {
         localStorage.setItem('categoryColors', JSON.stringify(categoryColors));
     }
 
     function getCategoryColor(category) {
         if (categoryColors[category]) {
-            return categoryColors[category]; // 이미 색상이 지정되었으면 반환
+            return categoryColors[category];
         }
-        // 새 카테고리면 다음 색상 할당
         const nextColorIndex = Object.keys(categoryColors).length % eventColors.length;
         const newColor = eventColors[nextColorIndex];
-        categoryColors[category] = newColor; // 새 색상 저장
-        saveCategoryColors(); // 변경사항 localStorage에 저장
+        categoryColors[category] = newColor;
+        saveCategoryColors();
         return newColor;
     }
 
@@ -201,16 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleScheduleSubmit(e) {
         e.preventDefault();
         const date = modal.dataset.date;
-        const currentSchedules = schedules[date] || [];
-        const colorIndex = currentSchedules.length % eventColors.length;
+        const category = document.getElementById('schedule-category').value || "#기타";
         const color = getCategoryColor(category);
         const newSchedule = {
             id: Date.now(),
-            category: document.getElementById('schedule-category').value || "#기타",
+            category: category,
             startTime: getSelectedTime('start'),
             endTime: getSelectedTime('end'),
             memo: document.getElementById('schedule-memo').value,
-            color: color
         };
         if (newSchedule.startTime >= newSchedule.endTime) {
             alert('종료 시간은 시작 시간보다 늦어야 합니다.');
@@ -361,12 +357,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.time-carousel').forEach(tc => {
         makeDraggable(tc, { direction: 'vertical' });
     });
-    
-    // 스플래시 화면 제어
-    setTimeout(() => {
-        splashScreen.classList.add('fade-out');
-        splashScreen.addEventListener('transitionend', () => {
-            renderAll(); 
-        }, { once: true });
-    }, 500);
+    renderAll();
 });
