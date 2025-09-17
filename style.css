@@ -1,6 +1,24 @@
-/* ... 기존 코드 상단 ... */
+/* 기본 스타일 및 변수 설정 */
+:root {
+    --bg-color: #0f172a;
+    --primary-text-color: #e2e8f0;
+    --secondary-text-color: #94a3b8;
+    --accent-color: #FFFFFF;
+    --panel-bg-color: rgba(255, 255, 255, 0.05);
+    --glow-color: rgba(255, 255, 255, 0.6);
+    --timeline-hour-height: 60px;
+}
 
-/* ✨ [수정] 스플래쉬 스크린 스타일 */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body { 
+    background-color: var(--bg-color); 
+    background-image: linear-gradient(180deg, #1e293b, #0f172a);
+    color: var(--primary-text-color); 
+    font-family: 'Noto Sans KR', sans-serif; 
+}
+
+/* 스플래시 스크린 스타일 */
 .splash-screen {
     position: fixed;
     top: 0;
@@ -17,7 +35,6 @@
     pointer-events: all;
     visibility: visible;
 }
-
 .splash-screen.fade-out {
     opacity: 0;
     visibility: hidden;
@@ -30,62 +47,80 @@
 @keyframes pop-in { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-
-/* ... 기존 코드 중간 ... */
-
+.calendar-container { position: relative; display: flex; flex-direction: column; width: 100%; height: 100dvh; padding: 1rem; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
+#month-year { font-size: 1.8rem; font-weight: 700; color: var(--accent-color); }
+.nav-arrow { background: none; border: none; color: var(--accent-color); font-size: 2rem; cursor: pointer; }
+.date-carousel { position: relative; overflow-x: scroll; padding: 10px 0; flex-shrink: 0; scrollbar-width: none; }
+.date-carousel::-webkit-scrollbar { display: none; }
+.date-carousel::before, .date-carousel::after { content: ''; position: absolute; top: 0; bottom: 0; width: 50px; z-index: 2; pointer-events: none; }
+.date-carousel::before { left: 0; background: linear-gradient(to right, var(--bg-color), transparent); }
+.date-carousel::after { right: 0; background: linear-gradient(to left, var(--bg-color), transparent); }
+.dates { display: flex; gap: 15px; cursor: grab; padding: 0 10px; }
+.date-item { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 65px; height: 80px; background-color: transparent; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; user-select: none; }
+.date-item:hover { border-color: rgba(255, 255, 255, 0.5); }
+.date-item.active { color: var(--accent-color); font-weight: 700; transform: scale(1.1); border-color: var(--accent-color); box-shadow: 0 0 15px 0px var(--glow-color); background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%); }
+.day-name { font-size: 0.8rem; color: var(--secondary-text-color); }
+.day-number { font-size: 1.5rem; }
+.schedule-panel { margin-top: 1rem; background-color: var(--panel-bg-color); border-radius: 15px; padding: 1.5rem; flex-grow: 1; min-height: 0; display: flex; flex-direction: column; }
+#selected-date-display { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; }
+.category-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; flex-shrink: 0; }
+.filter-btn { background-color: rgba(255, 255, 255, 0.1); border: 1px solid transparent; color: var(--primary-text-color); padding: 5px 12px; border-radius: 15px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
+.filter-btn.active { background-color: var(--accent-color); color: var(--bg-color); font-weight: 700; border-color: var(--accent-color); }
+.timeline-container { flex-grow: 1; position: relative; overflow-y: auto; }
+.timeline { position: relative; }
+.time-slot { display: flex; height: var(--timeline-hour-height); border-bottom: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; }
+.time-label { width: 60px; font-size: 0.9rem; color: var(--secondary-text-color); padding-top: 5px; text-align: right; padding-right: 10px; }
+.time-slot-placeholder { flex-grow: 1; border-left: 1px solid rgba(255, 255, 255, 0.1); }
+.timeline-events { position: absolute; top: 0; left: 60px; right: 0; bottom: 0; pointer-events: none; }
+.event-item { --event-color: var(--accent-color); --event-rgb-color: 255, 255, 255; pointer-events: all; position: absolute; left: 10px; right: 10px; background-color: rgba(var(--event-rgb-color), 0.15); border-left: 3px solid var(--event-color); border-radius: 4px; padding: 8px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: background-color 0.2s; }
+.event-item:hover { background-color: rgba(var(--event-rgb-color), 0.25); }
+.event-item-header { display: flex; justify-content: space-between; align-items: center; }
+.event-item .category { font-weight: 700; color: var(--event-color); }
 .event-item .memo { font-size: 0.9rem; margin-top: 4px; opacity: 0.9; }
-/* ✨ [추가] 일정 내 위치 텍스트 스타일 */
-.event-item .location {
-    font-size: 0.8rem;
-    margin-top: auto;
-    padding-top: 4px;
-    color: var(--secondary-text-color);
-    opacity: 0.8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ... 기존 코드 중간 ... */
-
-/* ✨ [추가] 일정 세부 정보 모달 스타일 */
-.details-view {
-    text-align: left;
-}
-#details-header {
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-#details-modal-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-.details-body p {
-    font-size: 1rem;
-    color: var(--primary-text-color);
-    margin-bottom: 1rem;
-    line-height: 1.6;
-    display: flex;
-    align-items: center;
-}
-.details-body p:before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 12px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.8;
-}
+.event-item .location { font-size: 0.8rem; margin-top: auto; padding-top: 4px; color: var(--secondary-text-color); opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.delete-btn { background: none; border: none; color: var(--secondary-text-color); cursor: pointer; font-size: 1rem; }
+.delete-btn:hover { color: #ff5555; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.modal-overlay.visible { opacity: 1; visibility: visible; }
+.modal-content { text-align: center; background-color: #161e31; padding: 2rem; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2); width: 90%; max-width: 400px; transform: scale(0.9); transition: transform 0.3s ease; }
+.modal-overlay.visible .modal-content { transform: scale(1); }
+.modal-content h3 { margin-bottom: 1.5rem; color: var(--accent-color); }
+#schedule-form { display: flex; flex-direction: column; gap: 1.2rem; }
+#schedule-form input, #schedule-form textarea { width: 100%; padding: 12px; background-color: var(--panel-bg-color); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: var(--primary-text-color); font-size: 1rem; text-align: center; transition: all 0.2s ease-in-out; }
+#schedule-form input:focus, #schedule-form textarea:focus { background-color: transparent; outline: none; border-color: var(--accent-color); box-shadow: 0 0 8px -2px var(--glow-color); }
+#schedule-form textarea { text-align: left; height: 100px; }
+.time-picker-wrapper { display: flex; gap: 1rem; justify-content: center; }
+.time-picker-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.time-picker { display: flex; flex-shrink: 0; height: 120px; position: relative; }
+.time-picker::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 40px; transform: translateY(-50%); background-color: rgba(255, 255, 255, 0.1); border-radius: 8px; z-index: 0; pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.2); }
+.time-carousel { height: 100%; width: 50px; overflow-y: scroll; scroll-snap-type: y mandatory; cursor: grab; }
+.time-carousel:active { cursor: grabbing; }
+.time-carousel::-webkit-scrollbar { display: none; }
+.time-item { height: 40px; display: flex; justify-content: center; align-items: center; scroll-snap-align: center; font-size: 1.2rem; user-select: none; }
+.time-item:first-child { margin-top: 40px; }
+.time-item:last-child { margin-bottom: 40px; }
+.modal-buttons { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; }
+.modal-buttons button { min-width: 100px; padding: 12px 20px; border-radius: 25px; border: none; font-size: 1rem; cursor: pointer; font-weight: 700; transition: all 0.2s ease-in-out; }
+.modal-buttons button[type="submit"] { background-color: var(--accent-color); color: var(--bg-color); }
+.modal-buttons button[type="submit"]:hover { transform: scale(1.05); box-shadow: 0 0 10px -2px var(--glow-color); }
+.modal-buttons button[type="button"] { background: transparent; color: var(--secondary-text-color); border: 1px solid var(--secondary-text-color); }
+.modal-buttons button[type="button"]:hover { background-color: var(--secondary-text-color); color: var(--bg-color); }
+.fab { position: absolute; bottom: 2rem; right: 2rem; width: 55px; height: 55px; border-radius: 50%; background-color: var(--accent-color); color: var(--bg-color); border: none; font-size: 2rem; font-weight: 700; line-height: 55px; text-align: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); z-index: 999; transition: transform 0.2s ease-in-out; }
+.fab:hover { transform: scale(1.1); }
+.app-footer { padding: 1rem 0 0 0; text-align: center; font-size: 0.8rem; color: var(--secondary-text-color); flex-shrink: 0; }
+.details-view { text-align: left; }
+#details-header { padding-bottom: 1rem; margin-bottom: 1rem; border-left: 5px solid var(--accent-color); padding-left: 1rem; }
+#details-modal-title { font-size: 1.5rem; font-weight: 700; }
+.details-body p { font-size: 1rem; color: var(--primary-text-color); margin-bottom: 1rem; line-height: 1.6; display: flex; align-items: center; }
+.details-body p:before { content: ''; display: inline-block; width: 20px; height: 20px; margin-right: 12px; font-size: 1.2rem; text-align: center; }
 #details-time::before { content: '🕒'; }
 #details-location::before { content: '📍'; }
-#details-memo::before { content: '📝'; }
-#details-memo {
-    align-items: flex-start;
-    white-space: pre-wrap; /* 메모의 줄바꿈을 그대로 표시 */
-}
+#details-memo::before { content: '📝'; align-self: flex-start; }
+#details-memo { align-items: flex-start; white-space: pre-wrap; }
 
-/* ... 나머지 코드는 이전과 동일 ... */
+@media (max-width: 480px) {
+    .time-picker-wrapper { flex-direction: column; align-items: stretch; }
+    .time-picker-container { flex-direction: row; justify-content: space-between; align-items: center; }
+    .time-picker { width: 70%; }
+}
