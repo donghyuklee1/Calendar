@@ -11,6 +11,13 @@
 </head>
 <body>
 
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <svg class="splash-icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zM5 8V6h14v2H5z"/></svg>
+            <h1 class="splash-title">Donghyuk's Calendar</h1>
+        </div>
+    </div>
+
     <div class="calendar-container">
         <header class="calendar-header">
             <button id="prev-month" class="nav-arrow" aria-label="이전 달">&lt;</button>
@@ -38,27 +45,14 @@
         </footer>
     </div>
 
-    <div id="schedule-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div id="schedule-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
         <div class="modal-content">
-            <h3 id="modal-title">새 일정 추가</h3>
+            <h3 id="schedule-modal-title">새 일정 추가</h3>
             <form id="schedule-form">
                 <input type="text" id="schedule-category" placeholder="#카테고리 (예: #회의)" required>
+                <input type="text" id="schedule-location" placeholder="📍 위치 (예: 15층 회의실)">
                 <div class="time-picker-wrapper">
-                    <div class="time-picker-container">
-                        <label for="start-hours">시작</label>
-                        <div class="time-picker" id="start-time-picker">
-                            <div class="time-carousel hours" id="start-hours" aria-label="시작 시간"></div>
-                            <div class="time-carousel minutes" id="start-minutes" aria-label="시작 분"></div>
-                        </div>
                     </div>
-                    <div class="time-picker-container">
-                        <label for="end-hours">종료</label>
-                        <div class="time-picker" id="end-time-picker">
-                            <div class="time-carousel hours" id="end-hours" aria-label="종료 시간"></div>
-                            <div class="time-carousel minutes" id="end-minutes" aria-label="종료 분"></div>
-                        </div>
-                    </div>
-                </div>
                 <textarea id="schedule-memo" placeholder="메모를 입력하세요..." rows="4"></textarea>
                 <div class="modal-buttons">
                     <button type="button" id="cancel-button">취소</button>
@@ -67,6 +61,23 @@
             </form>
         </div>
     </div>
+
+    <div id="details-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="details-modal-title">
+        <div class="modal-content details-view">
+            <div id="details-header">
+                <h3 id="details-modal-title"></h3>
+            </div>
+            <div class="details-body">
+                <p id="details-time"></p>
+                <p id="details-location"></p>
+                <p id="details-memo"></p>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="close-details-btn">닫기</button>
+            </div>
+        </div>
+    </div>
+
 
     <script src="script.js"></script>
 </body>
