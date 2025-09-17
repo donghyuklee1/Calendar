@@ -373,13 +373,29 @@ document.addEventListener('DOMContentLoaded', () => {
     addScheduleBtn.addEventListener('click', () => openModal());
     scheduleModal.addEventListener('keydown', (e) => handleModalKeydown(scheduleModal, e));
     detailsModal.addEventListener('keydown', (e) => handleModalKeydown(detailsModal, e));
-    
+
     // --- 초기 실행 ---
     populateTimeCarousels();
     makeDraggable(carousel, { direction: 'horizontal' });
     document.querySelectorAll('.time-carousel').forEach(tc => {
         makeDraggable(tc, { direction: 'vertical' });
     });
+    
+    // 스플래시 화면 제어
+    setTimeout(() => {
+        const splashScreen = document.getElementById('splash-screen');
+        if (splashScreen) {
+            splashScreen.classList.add('fade-out');
+            splashScreen.addEventListener('transitionend', () => {
+                // ✨ 이 부분이 중요합니다. 애니메이션이 끝나면 화면을 숨깁니다.
+                splashScreen.style.display = 'none'; 
+                renderAll(); 
+            }, { once: true });
+        } else {
+            // 스플래시 스크린이 없는 경우 바로 렌더링
+            renderAll();
+        }
+    }, 500); // 0.5초 후 페이드 아웃 시작
     
     setTimeout(() => {
         splashScreen.classList.add('fade-out');
