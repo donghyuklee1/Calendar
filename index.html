@@ -52,7 +52,21 @@
                 <input type="text" id="schedule-category" placeholder="#카테고리 (예: #회의)" required>
                 <input type="text" id="schedule-location" placeholder="📍 위치 (예: 15층 회의실)">
                 <div class="time-picker-wrapper">
+                    <div class="time-picker-container">
+                        <label for="start-hours">시작</label>
+                        <div class="time-picker" id="start-time-picker">
+                            <div class="time-carousel hours" id="start-hours" aria-label="시작 시간"></div>
+                            <div class="time-carousel minutes" id="start-minutes" aria-label="시작 분"></div>
+                        </div>
                     </div>
+                    <div class="time-picker-container">
+                        <label for="end-hours">종료</label>
+                        <div class="time-picker" id="end-time-picker">
+                            <div class="time-carousel hours" id="end-hours" aria-label="종료 시간"></div>
+                            <div class="time-carousel minutes" id="end-minutes" aria-label="종료 분"></div>
+                        </div>
+                    </div>
+                </div>
                 <textarea id="schedule-memo" placeholder="메모를 입력하세요..." rows="4"></textarea>
                 <div class="modal-buttons">
                     <button type="button" id="cancel-button">취소</button>
@@ -77,7 +91,6 @@
             </div>
         </div>
     </div>
-
 
     <script src="script.js"></script>
 </body>
