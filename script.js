@@ -382,9 +382,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     setTimeout(() => {
-        splashScreen.classList.add('fade-out');
-        splashScreen.addEventListener('transitionend', () => {
-            renderAll(); 
-        }, { once: true });
+        if (splashScreen) {
+            splashScreen.classList.add('fade-out');
+            splashScreen.addEventListener('transitionend', () => {
+                if(splashScreen) splashScreen.style.display = 'none';
+                renderAll(); 
+            }, { once: true });
+        } else {
+            renderAll();
+        }
     }, 500);
 });
