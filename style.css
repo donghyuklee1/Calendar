@@ -39,7 +39,7 @@ body {
     align-items: center;
     z-index: 2000;
     opacity: 1;
-    transition: opacity 1s ease-out, visibility 0.8s;
+    transition: opacity 0.5s ease-out, visibility 0.5s;
     pointer-events: all;
     visibility: visible;
 }
@@ -137,9 +137,9 @@ body {
 #details-modal-title { font-size: 1.5rem; font-weight: 700; }
 .details-body p { font-size: 1rem; color: var(--primary-text-color); margin-bottom: 1rem; line-height: 1.6; display: flex; align-items: center; }
 .details-body p:before { content: ''; display: inline-block; width: 20px; height: 20px; margin-right: 12px; font-size: 1.2rem; text-align: center; }
-#details-time::before { content: 'Time'; }
+#details-time::before { content: '🕒'; }
 #details-location::before { content: '📍'; }
-#details-memo::before { content: 'Note'; align-self: flex-start; }
+#details-memo::before { content: '📝'; align-self: flex-start; }
 #details-memo { align-items: flex-start; white-space: pre-wrap; }
 
 /* FAB & 푸터 */
@@ -150,7 +150,16 @@ body {
 /* 모바일 반응형 */
 @media (max-width: 768px) {
     .modal-overlay { align-items: flex-end; }
-    .modal-content { width: 100%; max-width: 100%; margin: 0; border-radius: 20px 20px 0 0; transform: translateY(100%); }
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
+        transform: translateY(100%);
+        /* ✨ [수정] 모바일에서 잘림 문제 해결 */
+        max-height: 90dvh;
+        overflow-y: auto;
+    }
     .modal-overlay.visible .modal-content { transform: translateY(0); }
     .time-picker-wrapper { flex-direction: column; align-items: stretch; }
     .time-picker-container { flex-direction: row; justify-content: space-between; align-items: center; }
