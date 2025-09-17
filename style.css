@@ -137,9 +137,9 @@ body {
 #details-modal-title { font-size: 1.5rem; font-weight: 700; }
 .details-body p { font-size: 1rem; color: var(--primary-text-color); margin-bottom: 1rem; line-height: 1.6; display: flex; align-items: center; }
 .details-body p:before { content: ''; display: inline-block; width: 20px; height: 20px; margin-right: 12px; font-size: 1.2rem; text-align: center; }
-#details-time::before { content: '🕒'; }
+#details-time::before { content: 'Time'; }
 #details-location::before { content: '📍'; }
-#details-memo::before { content: '📝'; align-self: flex-start; }
+#details-memo::before { content: 'Note'; align-self: flex-start; }
 #details-memo { align-items: flex-start; white-space: pre-wrap; }
 
 /* FAB & 푸터 */
