@@ -11,51 +11,41 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; overflow: hidden; }
+
+/* ✨ [개선] 동적 그라데이션 배경 */
 body { 
-    background-color: var(--bg-color); 
-    background-image: linear-gradient(180deg, #1e293b, #0f172a);
     color: var(--primary-text-color); 
-    font-family: 'Noto Sans KR', sans-serif; 
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(315deg, #0f172a, #111827, #312e81, #042f2e);
+    background-size: 400% 400%;
+    animation: gradientAnimation 20s ease infinite;
 }
 
-/* 스플래시 스크린 스타일 */
-.splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--bg-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 1;
-    transition: opacity 0.5s ease-out, visibility 0.5s;
-    pointer-events: all;
-    visibility: visible;
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
-.splash-screen.fade-out {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-.splash-content { text-align: center; }
-.splash-icon { width: 80px; height: 80px; fill: var(--accent-color); margin-bottom: 1rem; animation: pop-in 1s ease-out forwards; }
-.splash-title { font-size: 2.5rem; color: var(--accent-color); text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); animation: fade-in 1s ease-out 0.2s forwards; opacity: 0; }
 
-@keyframes pop-in { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
 .calendar-container { position: relative; display: flex; flex-direction: column; width: 100%; height: 100dvh; padding: 1rem; }
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
 #month-year { font-size: 1.8rem; font-weight: 700; color: var(--accent-color); }
 .nav-arrow { background: none; border: none; color: var(--accent-color); font-size: 2rem; cursor: pointer; }
-.date-carousel { position: relative; overflow-x: scroll; padding: 10px 0; flex-shrink: 0; scrollbar-width: none; }
+
+/* ✨ [개선] 자연스러운 페이드 효과를 위한 마스크 적용 */
+.date-carousel { 
+    position: relative; 
+    overflow-x: scroll; 
+    padding: 10px 0; 
+    flex-shrink: 0; 
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
 .date-carousel::-webkit-scrollbar { display: none; }
-.date-carousel::before, .date-carousel::after { content: ''; position: absolute; top: 0; bottom: 0; width: 50px; z-index: 2; pointer-events: none; }
-.date-carousel::before { left: 0; background: linear-gradient(to right, var(--bg-color), transparent); }
-.date-carousel::after { right: 0; background: linear-gradient(to left, var(--bg-color), transparent); }
+/* .date-carousel::before, .date-carousel::after는 이제 필요 없으므로 삭제해도 됩니다. */
+
 .dates { display: flex; gap: 15px; cursor: grab; padding: 0 10px; }
 .date-item { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 65px; height: 80px; background-color: transparent; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; user-select: none; }
 .date-item:hover { border-color: rgba(255, 255, 255, 0.5); }
@@ -83,7 +73,7 @@ body {
 .delete-btn:hover { color: #ff5555; }
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
 .modal-overlay.visible { opacity: 1; visibility: visible; }
-.modal-content { text-align: center; background-color: #161e31; padding: 2rem; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2); width: 90%; max-width: 400px; transform: scale(0.9); transition: transform 0.3s ease; }
+.modal-content { text-align: center; background-color: #161e31; padding: 2rem; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2); width: 90%; max-width: 400px; transform: scale(0.9); transition: transform 0.3s ease, border-radius 0.3s ease; }
 .modal-overlay.visible .modal-content { transform: scale(1); }
 .modal-content h3 { margin-bottom: 1.5rem; color: var(--accent-color); }
 #schedule-form { display: flex; flex-direction: column; gap: 1.2rem; }
@@ -114,12 +104,27 @@ body {
 #details-modal-title { font-size: 1.5rem; font-weight: 700; }
 .details-body p { font-size: 1rem; color: var(--primary-text-color); margin-bottom: 1rem; line-height: 1.6; display: flex; align-items: center; }
 .details-body p:before { content: ''; display: inline-block; width: 20px; height: 20px; margin-right: 12px; font-size: 1.2rem; text-align: center; }
-#details-time::before { content: '🕒'; }
+#details-time::before { content: 'Time'; }
 #details-location::before { content: '📍'; }
-#details-memo::before { content: '📝'; align-self: flex-start; }
+#details-memo::before { content: '/>'; align-self: flex-start; }
 #details-memo { align-items: flex-start; white-space: pre-wrap; }
 
-@media (max-width: 480px) {
+/* ✨ [개선] 모바일 팝업 최적화 (바텀 시트) */
+@media (max-width: 768px) {
+    .modal-overlay {
+        align-items: flex-end; /* 모달을 하단에 정렬 */
+    }
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 20px 20px 0 0; /* 상단만 둥글게 */
+        transform: translateY(100%); /* 기본적으로 화면 아래에 숨김 */
+    }
+    .modal-overlay.visible .modal-content {
+        transform: translateY(0); /* .visible 클래스가 붙으면 위로 올라옴 */
+    }
+
     .time-picker-wrapper { flex-direction: column; align-items: stretch; }
     .time-picker-container { flex-direction: row; justify-content: space-between; align-items: center; }
     .time-picker { width: 70%; }
