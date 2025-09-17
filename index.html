@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calen : Dar</title>
+    <title>Donghyuk's Calendar</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
             <svg class="splash-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zM5 8V6h14v2H5z"/></svg>
-            <h1 class="splash-title">Calen : Dar</h1>
+            <h1 class="splash-title">Donghyuk's Calendar</h1>
         </div>
     </div>
 
@@ -47,10 +47,10 @@
 
     <div id="schedule-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
         <div class="modal-content">
-            <h3 id="schedule-modal-title">새로운 일정 등록</h3>
+            <h3 id="schedule-modal-title">새 일정 추가</h3>
             <form id="schedule-form">
-                <input type="text" id="schedule-category" placeholder="카테고리 (예: #회의)" required>
-                <input type="text" id="schedule-location" placeholder="📍위치 (예: E11 #311)">
+                <input type="text" id="schedule-category" placeholder="#카테고리 (예: #회의)" required>
+                <input type="text" id="schedule-location" placeholder="📍 위치 (예: 15층 회의실)">
                 <div class="time-picker-wrapper">
                     <div class="time-picker-container">
                         <label for="start-hours">시작</label>
@@ -67,10 +67,10 @@
                         </div>
                     </div>
                 </div>
-                <textarea id="schedule-memo" placeholder="세부 사항을 기록하세요.." rows="4"></textarea>
+                <textarea id="schedule-memo" placeholder="메모를 입력하세요..." rows="4"></textarea>
                 <div class="modal-buttons">
                     <button type="button" id="cancel-button">취소</button>
-                    <button type="submit">등록</button>
+                    <button type="submit">저장</button>
                 </div>
             </form>
         </div>
