@@ -18,41 +18,6 @@ body {
     font-family: 'Noto Sans KR', sans-serif; 
 }
 
-/* 스플래시 스크린 스타일 */
-.splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--bg-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 1;
-    transition: opacity 0.5s ease-out;
-    pointer-events: all;
-}
-
-.splash-screen.fade-out {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.splash-title {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    animation: pulse 1.5s infinite alternate;
-}
-
-@keyframes pulse {
-    from { transform: scale(1); opacity: 1; }
-    to { transform: scale(1.05); opacity: 0.9; }
-}
-
 .calendar-container { position: relative; display: flex; flex-direction: column; width: 100%; height: 100dvh; padding: 1rem; }
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
 #month-year { font-size: 1.8rem; font-weight: 700; color: var(--accent-color); }
